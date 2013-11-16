@@ -1,0 +1,2 @@
+今天周2在公司，安装安卓开发环境，除此之外将markup库集成到程序中，并纠添加markup后程序
+中的bug，然后利用markup来操作xml文件，采用xml文件来作为C++chengche程序的配置文件，
