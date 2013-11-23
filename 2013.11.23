@@ -1,0 +1,44 @@
+1：java中比较对象有所不同，因为比较的通常都是句柄，所以
+ 		Integer  in1 = new Integer(1);
+		Integer  in2 = new Integer(1);
+		System.out.println(in1 == in2); // compares the handle not the value
+这样打代码返回的是false，因为对象的句柄不同，但是我们比较的就是句柄。可以采用对象的equals函数来解决这个问题。
+	System.out.println(in1.equals(in2));
+这样输出结果就是true；
+2：java中多了一种移位运算符，>>>这种元素符是在最高位加0,。
+3：java中不会把符号型的数字转换为boolean类型，在while（x = y）中，判断语句中x=y是一个常量，不会把常量变成bool值。同理在&&，|| 中也类似，&&，|| 两边必须是boolean类型的值，不能是正数之类的，如果是就出错。
+4：java 中的造型其实跟强制类型转换差不多，就是明确的指定将原来的类型转换成什么类型。
+float ft = 1e-45; // error
+floar tf = 1e-45f;//OK
+float tf = (float)tf1e-45;//OK
+
+5: java 继承了所有的C控制语句，但是goto语句没有继承，但是goto依然作为保留关键字。
+6：java 中的函数如果将宽度大的变量传递给宽度小的变量时候一定要强制类型转换，否则会报错
+7：java中的构造器其实就是C++中的构造函数，当自己没有构造构造器的时候，系统就会建立一个无参的构造器。当自己写了一个有参或者无参的构造函数的时候，系统都不会再提供任何构造器，这点跟C++一样。但是不同的java中的构造器可以调用自身的构造器（一个构造函数中只能调用一次别的构造函数）如下面代码所示：
+class load
+{
+load(int i)
+{
+	m_int = i;
+}
+load(float j)
+{
+	m_float = j;
+}
+load(int i,float j)
+{
+	this(i);
+	m_float = j;
+	System.out.println(m_int);
+	System.out.println(m_float);
+}
+private int m_int;
+private	float m_float;
+public static void main(String s[])
+{
+	load mm = new load(1,1.02f);
+}
+}
+8：java中成员变量可以在里面初始化，初始化时按变量的顺序来执行的。
+9:java类中不管变量如何散列分布，在创建类对象时都会对类成员变量进行初始化。先初始化static成员变量，然后是非static成员变量。static成员变量初始化仅仅发生在对象第一次建立的时候。
+
