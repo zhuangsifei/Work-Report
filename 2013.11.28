@@ -1,0 +1,26 @@
+今天继续学习java，包括java的编译，类的访问等，其中类的访问主要是因为涉及了一个包的问题，以及因为比C++多了一些限定符，所以有
+点复杂，先把一些笔记写下来。
+1：java编译单元
+.java文件是一个编译单元，每个编译单元顶多只有一个public标记的类，被public标记的类名字必须和文件的名字相同（包含大小写形式，
+但排除文件扩展名.java）当然一个.java文件可以包含许多其它类，但是其它类都是为这个public类起支撑作用的，他们都不能
+是public的。当.java文件中没有public标记的类时，这个类不能被外部访问，也就没意义了。
+2：java编译
+可以利用javac  xx.java对java编译单元进行编译，可以发现一个.java文件中有几个类，就会变成产生几个.class文件，这个和C++中一
+个编译单元产生一个.object文件是不一样的。需要注意的是如果在一个包中包含两个java文件，如A.java,B.java，如果两个java文件中
+都包含一个相同名字的类如Test。那么这两个java文件编译后，只能产生一个Test.class,当然是谁后编译，这个Test.class就属于谁
+的。一个有效的程序就是一系列的class文件，他们可以封装和 压缩到一个jar文件。
+3：package
+package  其实就是想当于一个namespace，为了避免命名冲突，可以用package将许多.java文件以及编译产生后的许多.class文件给包
+起来。当你建立一个package时候。会自动产生一个同名的文件夹。例如，我们创建一个ddxxpackage时候，会自动的创建一个
+ddxxpackage的文件夹，当我们在一个java文件中的第一个非注释语句写
+package ddxxpackage;时，我们的java文件就处于这个ddxxpackage文件夹里面。说道本质就是利用操作系统的文件路径的相互独立性
+来避免命名冲突。
+4：自动编译
+当在程序中利用导入包中的类来产生一个类对象的时候，编译器会寻找同名的.class文件，如果就这一个.class文件，那么就利用
+这一个class来创建对象，如果还有一个同名的.java文件，那么会比较诸如xx.class 和xx.java两个文件的时间先后， 如果xx.java
+比较新，那么就会自动编译xx.java产生新的xx.class来产生对象。
+5：在同一个package中注意的问题
+同一个包中不同的java编译单元中不能包含相同的类名，即便是friend的类也不行，因为这样在编译的时候会产生类已经定义的错
+误告示。如A.java包含test class,B.java包含test.class那么编译时候就会出现 the type test isalready defined。
+
+还有一些类的东西由于还没完全搞清，所以先不写
