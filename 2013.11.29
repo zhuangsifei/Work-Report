@@ -1,0 +1,39 @@
+（1）类的种类（按声明范围）：
+1：top level class
+top level class 是一种不嵌套在任何类或者接口体内的类
+2：nested class 
+nested class就是一种类，它的声明在另外一个类或者接口的体内，nested class 包括
+member class，local class，anonymous class，
+（2）类的种类（按访问权限）
+1：public class
+public class 是一种公共类，
+2：private class
+3：protected class
+4：default class
+（3）类的种类（按实现方式）
+1：abstract class
+2：interface class
+3：final class
+4：strictfp class
+(4) 类的体内结构
+类体包括 member，instance，static instance，constructor。
+member包括fields，methods，nested classes，interfaces。member class，member interface，field，method，constructor可以被public，private，protected修饰。其中子类中新声明的fields，classes，interfaces可以掩盖父类中的fields，classes，interfaces。子类中新声明的method可以掩盖，实现或者重载父类中的method。member field可以被final修饰，member class可以被static修饰，member method可以被abstract，final，
+（5）类的修饰符
+public ,private ,proteted,abstract,final，static ，（default：就是什么都不写）
+1：public 只能修饰top level class，member class，不能修饰local class，anonymous class
+2：private 只能修饰member class
+3：protected 只能修饰member class
+4：static 只能修饰member class
+5：abstract 
+	abstract 修饰class时表示class里面有method没有实现（method 被abstract修饰），但是abstract class 里面的method既可以
+全部abstract，也可以全部不abstract，更可以一部分abstract，一部分不abstract。
+	abstract修饰的类不能被instance（实例化），原因就是既然标记了abstract，那么里面就可能包含没有实现的method。
+	abstract修饰的类被继承时，如果子类没有把父类中所有的abstract method implement（实现）的话，那么子类必须被abstract标记修饰，当然如果全部完成的话，就可以不用abstract去修饰子类，当然还可以加。
+	abstract类中的abstract method 只能被public 或者protected修饰，不能被private修饰
+6：final
+	final 修饰class时表示class里面所有的method都必须实现，final修饰的class不能被继承
+7：strictfp
+	strictfp修饰类时候，类中所有与float，double有关的表达式（包括变量初始化，实例初始化，静态初始化，构造函数初始化）都必须严格的执行计算，遵守FP-strict的限制,符合IEEE-754规范。
+（6）inner class
+	inner class 是一个嵌套类，（它是不显式或。。。。）。包括local class，anonymous class ，non-static class。
+	inner class 不能声明静态成员，除非这个成员是常量。但是非inner class 比如static class 就可以随便声明static 变量。由于interface 隐式的是static ，所以interface不能是inner class，它只能处于top level class中 
