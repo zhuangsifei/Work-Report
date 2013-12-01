@@ -1,0 +1,122 @@
+1：关于implements：
+interface  Inter2
+{
+	void func(int x,int y);
+}
+interface Inter3
+{
+	void func(int x,int y);	
+}
+
+public class Inter1 implements Inter2 , Inter3
+{
+	public void func(int x,int y)
+	{
+		
+	}
+}
+这样是没有问题的，但是下面这样就有问题了
+interface  Inter2
+{
+	void func(int x,int y);
+}
+interface Inter3
+{
+	int func(int x,int y);	
+}
+
+public class Inter1 implements Inter2 , Inter3
+{
+	public void func(int x,int y)
+	{
+		
+	}
+}
+因为此时继承来自父interface 的两个函数 void func（int x,int y）,int func(int x,int y)
+函数名字，参数完全相同，只是返回类型不一样，我们知道重载函数不能依靠函数的返回类型，那么
+要在子类的实现两个仅有返回类型不一样的函数是万万不可能的。
+
+2：关于对默认类继承的问题
+package package1;
+public class Inter1{
+	public int x,y;
+	public void move(int dx,int dy){
+		x += dx;
+		y += dy;
+	}
+}
+********************************************
+package package2;
+import package1.Inter1;
+class Inter3 extends Inter1{
+	public int z;
+	void move(int dx,int dy,int dz){
+		super.move(dx,dy);
+		z += dz;
+	}
+}
+public class Inter2 {
+	public static Inter3 GetInter1(){
+		return new Inter3();
+	}
+}
+********************************************
+package package3;
+import package2.Inter2;
+public class InterM {
+
+	public static void main()
+	{
+		Inter2 yy = new Inter2();
+		
+		//error,yy类型是Inter3，Inter3是默认类型只能在定义它的包内访问
+		//int mz = yy.GetInter1().x; 
+	}
+}
+********************************************
+以上是三个编译单元，在package3中，我们可以看到获取的yy.GetInter1()是（Inter3）类型，不能被访问，
+这个没什么好说的。如果我们把package2中的Inter2中的public static Inter3修改为public static Inter1，
+那么我们就可以访问其中的x,y,move(int dx,int dy).因为yy.GetInter1()的类型是（Inter1），那么Inter1
+是public的，其中的x,y,move(int dx,int dy)也是public的。所以我们可以访问。
+
+再者我们继续修改程序，修改package2，如下：
+********************************************
+package package2;
+import package1.Inter1;
+class Inter3 extends Inter1{
+	public int z;
+	void move(int dx,int dy,int dz){
+		super.move(dx,dy);
+		z += dz;
+	}
+}
+public class Inter2 extends Inter3{
+	public static Inter3 GetInter1(){
+		return new Inter3();
+	}
+}
+此时的Inter2继承了Inter3，虽然Inter3是default类型，但是我们的Inter2继承了它，那么Inter3中该有的性质都会转到
+Inter2中。那么此时我们可以访问z（Inter3中 z是public的），但是不可以访问move（int dx，int dy，int dz），因此它
+是default类型的。
+从上面可以看出访问权限最先取决于类的访问权限，其次是取决于成员的访问权限。
+
+3：类中对字段的修饰
+public，private，protected，static，final，transient，volatile
+non-static field 也被叫做instance variable。
+static 变量只被初始化一次，当且仅当类第一次被初始化或者其被第一次调用的时候。
+
+4:字段的变量隐藏问题
+在父类中有一个变量int x，子类中又定义了一个变量int  x。那么子类中x就会隐藏父类中的x，其实这个时候如果出现了变量的同名
+那么子类不会继承父类中的同名变量，如果非要在子类中运用父类中的同名变量的话，那么就要用一个super.x了。
+5：final 字段
+final变量跟C++中的const变量一样不可以被修改
+6：transient 字段
+类中被标记为transient的字段不跟non-transient字段一样，他们不会被serialization（串行化），就是说没跟non-trasient字段连续保存
+在一起。
+7：volatile 字段
+这个跟共享内存多线程有关系，Java编程语言允许线程访问共享变量。作为一项规则，为确保共享变量一致而可靠地更新，一个
+线程应保证它可以通过锁定这些共享内存来独占使用这些变量。
+Volatile修饰的成员变量在每次被线程访问时，都强迫从共享内存中重读该成员变量的值。而且，当成员变量发生变化时，强迫
+线程将变化值回写到共享内存。这样在任何时刻，两个不同的线程总是看到某个成员变量的同一个值。
+8：成员变量初始化时不能用还没定义的初始化的变量去初始化定义在它前面的变量。
+
