@@ -1,0 +1,178 @@
+1:extend：
+extend用于class的继承或者interface的继承，
+class 只能继承一个class，但是interface 可以继承多个interface。
+implements：
+implements只能用于class implements interface，所以implements后面
+跟的只能是interface。
+一个class只可能extends一个class，但是可以implements多个interface
+
+2:关于继承的时候的super构造函数
+子类的构造函数会调用调用父类的super构造函数，当然可以不显式的调用是可以的，前提是要保证子类有默认的构造函数，那么当你不显示
+
+式调用的时候，子类会自己主动的去调用父类的默认构造函数。如果父类没有默认构造函数，那么必须在子类的构造函数中显式的调用父类
+
+的构造函数，通过super（arg1，arg2，……）
+
+3:关于普通类继承的多态性
+我们可以把一个子类的句柄赋给一个父类的句柄，这是合法的。
+class Base
+{
+	void play()
+	{System.out.println("base");}
+}
+class Son
+{
+	void play()
+	{System.out.println("Son");}
+}
+public class Generals
+{
+	Base Bson = new Son();//OK
+}
+
+4：关于抽象类继承的多态性
+抽象类是类中有未实现的method，或者即便全部实现也可以加个abstract来修饰class。但是有abstract修饰的method一定要用abstract来修
+
+饰class。即便abstract class不能有实例化，但是可以把子类的实例赋值给abstract的句柄。这点跟类的上溯造型很类似
+abstract class Base
+{
+	void play()
+	{System.out.println("base");}
+}
+class Son
+{
+	void play()
+	{System.out.println("Son");}
+}
+public class Generals
+{
+	Base Bson = new Son();//OK
+}
+
+6:关于接口继承的多态性
+接口跟抽象类类似，都不能实例化，但是我们可以把实现接口的类实例化，然后将实例化的句柄赋值给接口的句柄,不过要注意的是接口中的
+
+字段和对象都是默认public的，也只能是public访问权限的，要不然怎么继承实现它。
+接口中的字段是static and final的，利用接口的这一性质，我们可以定义一个接口，让其里面只有字段，那么这样的接口就相当于一个
+Interface Base
+{
+	void play();
+	int x = 5;//static and final
+}
+class Son implements Base
+{
+	public void play()
+	{System.out.println("Son");}
+}
+public class Generals
+{
+	Base Bson = new Son();//OK
+}
+
+7：关于匿名类
+public class Parcel6 {
+  public Contents cont() 
+  {
+	return new Contents() 
+	{
+		private int i = 11;
+		public int value() 
+		{ return i; }
+	}; // Semicolon required in this case
+  }
+  public static void main(String[] args) 
+ {
+ 	Parcel6 p = new Parcel6();
+ 	Contents c = p.cont();
+ }
+} 
+
+上面的程序return语句后面直接跟分号，而是直接跟了一个{}，这其实就是一个匿名类，它的作用相当于下面语句：
+class MyContents extends Contents {
+private int i = 11;
+public int value() { return i; }
+}
+return new MyContents();
+匿名类是没有构造函数的。
+
+8：static 内部类的一些特性
+static内部类是不能访问包围它的外部类的non-static member。static class可以位于interface内部，
+interface IInterface {
+static class Inner {
+int i, j, k;
+public Inner() {}
+void f() {}
+}
+} 
+
+9:内部类的实例化
+内部类实例化的时候必须用到外部类的实例化句柄。原因是内部类用可以用到外部类的字段或者方法，而这些字段和方法又必须跟实例对象
+
+有关，所以内部类的初始化必须用到外部对象的实例。
+public class TestConstructor 
+{
+	 
+	public static void main(String [] Str)
+	{
+		TestConstructor Test = new TestConstructor();
+		TestConstructor.Inner xx = Test.new Inner();
+	}
+	class Inner
+	{}
+}
+10:内部类的继承
+当继承一个内部类的时候，需要对一个内部类的外部类包含进去，特别是一个构造函数需要特别处理，因为我们知道，类的内部类的构造函
+
+数跟外部类的实例化有关系，所以我们要用到外部类的实例去构造继承类的构造函数。
+public class TestConstructor 
+{
+	 
+	public static void main(String [] Str)
+	{
+		TestConstructor Test = new TestConstructor();
+		TestConstructor.Inner xx = Test.new Inner();
+	}
+	class Inner
+	{
+		
+	}
+	
+}
+class Outer extends TestConstructor.Inner
+{
+	Outer(TestConstructor xx)
+	{
+		xx.super();//must have this sentence
+	}
+}
+
+11 继承时的构造函数
+子类对父类的继承时，首先会追溯到父类，初始化父类中字段，实例，然后是父类的构造函数，然后是子类的字段，实例，最后是子类的构
+
+造函数。
+class Apple{
+	Apple(){
+		System.out.println("This is apple");}
+}
+class Banana{
+	Banana(){
+		System.out.println("This is banana");}
+}
+class Base{
+	Base(){
+		System.out.println("Base Constructor");}
+	Apple app = new Apple();
+}
+public class Son extends Base{
+	Son(){
+		System.out.println("Son Constructor");}
+	Banana Ban = new Banana();
+	public static void main(String[] Str){
+		Son Super = new Son();
+	}
+}
+结果是：
+This is apple
+Base Constructor
+This is banana
+Son Constructor
