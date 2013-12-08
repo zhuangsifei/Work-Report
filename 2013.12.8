@@ -1,0 +1,66 @@
+1：java数组的声明
+java数组的声明种类有4种，java中的数组如果没有初始化是不能使用数组相关的函数的或者字段的，如不能c.length
+Wheel[] a = new Wheel[2]; //java only format
+Wheel b[] = new Wheel[4]; //like C++
+Wheel[] c;				  // empty 
+Wheel[] d = {new Wheel(),new Wheel(),new Wheel()}; //declare and init
+
+2：java中数组内容的初始化
+java数组内容的初始化可以在声明的时候直接初始化，可以声明后一个一个的初始化，可以通过数组之间的赋值来初始化，还可以直接通过
+
+new来初始化。java中通过数组之间的赋值来初始化如b=c，那么b，c将会变得一模一样，，其中不要求b，c之间的长度大小一致。
+Wheel[] d = {new Wheel(),new Wheel(),new Wheel()}; //declare and init
+
+for(int i =0;i<a.length;i++) //init by one by one
+	a[i] = new Wheel();
+		
+c = new Wheel[]{new Wheel(),new Wheel()};// a new way to init
+ 	
+b = c; //assign a big array by a small one	
+
+3：java中的集合
+java中的集合有Vector，BitSet，Stack，HashTable，这些集合的对象都是Object对象的句柄，所以在创建集合时要准确的利用造型来解决
+
+问题。
+Vector遍历元素的时候，可以使用一个enumeration来搞定，
+Enumeration e = Vec.elements();
+while(e.hasMoreElements())
+((Cat2)e.nextElement()).print();
+通过诸如这样的语句来实现遍历。
+
+4：java中新的集合
+Collection，Sets，Lists，Queue，Maps
+其中Collec跟map是平等级别关系，Lists，Sets继承了Collection。
+
+在Lists中有ArrayList，LinkedList，其中ArrayList相当于数组，随机访问速度快，中间添加删除元素速度慢。LinkedList相当于链表，顺
+
+序访问可以，随机不行，但是中间添加删除元素速度快。
+		
+Set中有HashSet,TreeSet.HashSet中的顺序是无序，TreeSet中的元素是排好序的。
+Map中有TreeMap 和HashMap。TreeMap是依据红黑树来实现的，HashMap是依据哈希表来实现的。
+
+5：新集合的声明
+新集合的声明可以多种多样，包括以下几种形式，其中集合现在可以是类似C++中的模板，所以通用性变强。
+		Set<String> St = new HashSet<String>();
+		Set st1 = new HashSet<String>();
+		Set St2 = new HashSet();
+		Set<String> st3 = new HashSet();
+		HashSet<String> st4 = new HashSet<String>();
+		HashSet St5;
+6：使集合元素不可修改
+List a = new ArrayList();
+a = Collections.unmodifiableList(a);// 关键句子
+ListIterator lit = a.listIterato r();
+System.out.println(lit.next()); // Reading OK
+//! lit.add("one"); // Can't change it
+7：使集合元素同步
+通过集合的同步，可以防止多个进程同时修改一个容器内元素的发生。实例程序如下所示：
+Collection c = 
+Collections.synchronizedCollection(
+new ArrayList());
+List list = Collections.synchronizedList(
+new ArrayList());
+Set s = Collections.synchronizedSet(
+new HashSet());
+Map m = Collections.synchronizedMap(
+new HashMap());
