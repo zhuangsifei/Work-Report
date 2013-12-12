@@ -1,0 +1,128 @@
+
+1：java中的异常机制
+java中的异常可以说核心就try，catch，finally，其中try中表示可能出现异常的语句，catch用来捕获异常，finally用来执行不管异常发生不发生都要执行的语句，比如说资源的清理。总体结构如下所示：
+try
+{//...}
+catch(Exc e)
+{//...}
+catch(Exc e)
+{//...}
+finally{}.
+或者
+try{//...}
+finally{//...}
+其中一个try模块可以对应多个catch，表示处理多种异常
+2：java SE7中try的新语法
+try（expression），这样的语句中expression表示资源，那么打开的资源可以不用去操心退出或者关闭了。
+
+3：throws 关键字
+在方法中声明了throws Exception，这以为这在方法体重发生了错误的话，错误将会被抛给调用者，例子：
+public void func() throws IOException,NumberFormatException//指的抛出的各种异常，可以多个
+{}
+
+4：异常的自定义
+class TooBigException extends Exception
+{
+	public TooBigException(String msg)
+	{super(msg);}
+}
+这样从Exception继承的异常，可以直接throw了，例如：throw new TooBigException("bigbig");
+
+5：重新抛出异常
+try {}
+catch()
+{
+//do something
+throw (exceptionObjectName)//重新抛出异常
+}
+
+6：重定义方法中的异常声明
+重定义的方法异常声明必须满足以下几点规则：
+（1）重定义的方法必须与被重定义的方法的异常相同
+（2）重定义的方法可以抛出被重定义的方法的异常的子类异常
+（3）重定义的方法不可以抛出被重定义的方法的父类的异常
+（4）在重定义抛出多个异常的时候，重定义方法必须抛出被重定义方法的异常子集
+（5）父类方法没有抛出异常，那么子类方法也不能抛出异常
+
+7：同一个函数中的声明的异常必须是抛出异常的父类或者同类，不然就会出错。
+public static void  func1() throws Throwable
+	{
+		throw new Throwable("from func1");
+	}
+这里如果把函数声明中的异常声明throws Throwable改成throws Exception，那么这个函数编译就出出错。我想这个跟造型有关，我们可以把子类句柄安全的传递给父类，但是却不能把父类句柄安全的传递给子类。通过下面的例子可以说明这一点
+
+public class Excepts {
+	public static void  func1() throws Throwable
+	{
+		throw new Throwable("from func1");
+	}
+	public static void main(String[] Str) throws Throwable
+	{
+		try
+		{
+			func1();
+		}
+		catch(Exception e)
+		//catch (Throwable e)
+		{
+			System.out.println("This is the main catch");
+		}
+	}
+
+}
+
+上面这个程序中，main函数获得异常是Throwable异常，他不能转换成Exception异常，所以没有进入catch模块。
+public class Excepts {
+	public static void  func1() throws Throwable
+	{
+		throw new Exception("from func1");
+	}
+	public static void main(String[] Str) throws Throwable
+	{
+		try
+		{
+			func1();
+		}
+		catch(Exception e)
+		//catch (Throwable e)
+		{
+			System.out.println("This is the main catch");
+		}
+	}
+
+}
+我们把func1中的异常变成Exception后，在main函数中捕获到了异常。综上说明了这样的问题，函数中抛出的异常会传递给函数中声明的异常（类型转换）；抛出子异常，转换成声明中的父异常，然后在catch的是子异常，这时候父异常也能顺利的转换成子异常。
+
+8：未解的问题
+当把上面public static void main(String[] Str) throws Throwable中的throws Throwable去掉后，就会出现错误，这个原因是什么，现在还不知道
+经过思考，我现在已经明白了这个问题，当我们用一个子类来捕捉父类的异常的时候，不一定就能够将父类安全的转换成子类，所以这个时候必须要么在catch模块中增加catch直到能处理父类的异常，要么就在函数的声明中抛出异常。如下：
+public static void main(String[] Str) 
+	{
+		try
+		{
+			func1();
+		}
+		catch(Exception e)
+		//catch (Throwable e)
+		{
+			System.out.println("This is the main catch");
+		}
+		catch(Throwable e)
+		{
+			System.out.println("This is in main's Throwable");
+		}
+	}
+或者
+public static void main(String[] Str) throws Throwable
+	{
+		try
+		{
+			func1();
+		}
+		catch(Exception e)
+		{
+			System.out.println("This is the main catch");
+		}
+	}
+
+10:父类方法抛出异常，子类重定义该方法，不一定要抛出异常，但是父类没有定义异常，子类一定不能声明异常，否则就会编译出错，这是因为。当父类没有异常，若子类有异常时，我们用一个句柄指向父类对象的时候这个时候可以没问题，但是再重新指向子类对象的时候若子类对象抛出异常，但此时却没异常控制，就会出问题。
