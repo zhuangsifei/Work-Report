@@ -1,0 +1,189 @@
+1:javaIO 的分类
+java IO 从字节和字符方面分为字节IO，字符IO，字节IO毫无疑问就是说读写的单位是面向字节，字符IO就是说读写的单位面向是字符，java采用的是unicode编码，每个字符采用的是两个字节。
+javaIO层次继承图
+			Object
+InputStream 	OutputStream 	Reader	 Writer 	File
+其中InputStream，OutputStream是面向字节的，那么继承他们的类也是面向字节的，Reader，Writer是面向字符的，继承他们的类也是面向字符的。每个面向字节的函数在面向字符中都有类似的相关函数对应。
+
+2：关于InputStream 
+java.io.InputStream (implements java.io.Closeable)
+	java.io.ByteArrayInputStream
+	java.io.FileInputStream
+	java.io.FilterInputStream
+		java.io.BufferedInputStream
+		java.io.DataInputStream (implements java.io.DataInput)
+		java.io.LineNumberInputStream
+		java.io.PushbackInputStream
+	java.io.ObjectInputStream (implements java.io.ObjectInput, java.io.ObjectStreamConstants)
+	java.io.PipedInputStream
+	java.io.SequenceInputStream
+	java.io.StringBufferInputStream
+InputStream 是面向字节的输入流的基类，它提供了一些基本的函数以及待子类完善的接口。
+int available（）：返回流目前状态到结尾的估计字节数目，如果你从文件开头开始估计，那么返回的字节数就是整个文件的字节数，如果	你从文件的末尾返回，那么估计的字节数就是0
+void close（）：关闭流
+void mark(int Readlimit):标记输入流的当前位置
+void reset()：把文件的位置重新定位到最后一次mark中位置，它和mark是成对使用，但是必须要求文件流是markSurpport（）返回true。
+void markSurpport():判断文件流是否支持mark ，reset
+abstract int read():读取下一个字节,正常的话返回0-255内的一个数（该字节的整数值），结束的话返回-1.
+int read(byte[] b)：读取字节到数组中，读取的长度尽最大可能和数组b的长度相等。返回读取的字节数。
+int read(byte[] b,int off,int len）：off是偏移量，length是读取的长度。
+long skip（long n）：跳过n个字节，只能向前跳。
+3：我们对流的操作，一般就包括文件，对象，控制台
+（1）FileInputStream 《-- InputsStream
+除了继承来自InputStream类的方法外，FileInputStream自身没有增加几个方法，
+public FileChannel getChannel()：返回和这个输入流相关的唯一的输入流的FileChannel 对象。
+protected void finalize()throws IOException：确保文件流已经close
+public final FileDescriptor getFD（）throws IOException：返回FileDescriptor Object（代表和文件系统中真实文件相连的）
+（2）ByteArrayInputStream 《-- InputStream
+ 除了来自基类InputStream的函数外，ByteArrayInputStream的函数基本就是这些，只不过是增加了几个字段，
+byte[] buf:构造函数构造的byte数组
+int count：buf中最大的可用字节数
+int mark：流中当前保存的标记位置
+int pos：流缓冲中下一个待读取的字节的位置
+(3)FilterInputStream《--InputStream
+它重载了InputStream所有的函数，自身没什么作用，主要是它的几个继承子类，它有一个字段InputStream in，通过这个字段来载入数据源。
+(4)ObjectInputStream《--InputStream，
+用这个类来实现对对象，int，float，double，byte ，char等等各种对象的读取。如果要读写对象，那么那个对象必须实现Serialization的接口。
+（5）SequenceInputStream《- InputStream
+用SequenceInputStream来实现多个输入流的逻辑连接。SequenceInputStream 有两个构造函数
+
+SequenceInputStream（InputStream s1，InputStream s2）
+SequenceInputStream(Enumeration e);
+（6）PipedInputStream《--InputStream
+提供管道通信，和PipedOutputStream之间建立连接，并提供PipedOutputStream 待写入的数据。
+void  connect（PipedOutputStream src），输入输出管道之间建立连接。
+（7）StringBufferInputStream《--InputStream
+函数接口基本和InputStream一样，只不过操作的对象是String，不是File而已。
+4：关于javaIO的链接顺序
+	一般就是通过物理文件通过FileInputStream或者FileReader之类的来打开；
+	将文件通过BufferedInputStream，或者BufferedReader读到缓冲区内
+	通过DataInputStream来读取int，char等各种基本数据
+
+	关于文件的写操作跟这个顺序刚好相反。
+5：FilterInputStream的那些重要的子类
+（1）BufferedInputStream
+内部建立一个Byte Array这样的缓冲区，既然有缓冲区，那么就有count，mark，pos等字段。其余的函数接口都跟InputStream差不多
+（2）DataInputStream
+这个类除了那些和InputStream相同的接口外，另外提供了专门用来读写基本数据类型的各种函数，readInt，readDouble等。
+（3）LineNumberInputStream
+这个类的接口和InputStream基本类似，只不过增加了行号的处理，多了两个函数
+int GetLineNumber（）：获取当前的行号
+void SetLineNumber():设置当前行号
+（4）PushBackInputStream
+这个类毫无疑问就是将流的当前位置后退一个或者多个字节，相比InputStream，它里面提供了倒退字节的函数。
+void unRead（byte[] b）:把从中读取的字节数组返回，那么流的位置就变得离开头近了
+void unRead（byte[] b,int off,int len）:把数组b中从off开始的len长度的字节返回（复制）到流中，这样流就跟之前很相似了。
+6：OutputStream的那些重要的子类
+原则上in和out是相对的，in有的out都有相对的，但是还是有一些差异的。
+void write（int b）：将参数b中低8位指定的字节写到输出流中，b中的高24位将会被忽略
+void write（byte[] b）:将数组b写入到输出流中
+void write（byte[] b,int off,int len）：将数组b的指定字节写到输出流中
+void flush（）：强制立即写入文件缓冲区中，不必等待操作系统的安排。
+void close（）：关闭输出流
+
+java.io.OutputStream (implements java.io.Closeable, java.io.Flushable)
+	java.io.ByteArrayOutputStream
+	java.io.FileOutputStream
+	java.io.FilterOutputStream
+		java.io.BufferedOutputStream
+		java.io.DataOutputStream (implements java.io.DataOutput)
+		java.io.PrintStream (implements java.lang.Appendable, java.io.Closeable)
+	java.io.ObjectOutputStream (implements java.io.ObjectOutput, java.io.ObjectStreamConstants)
+	java.io.PipedOutputStream
+7：FilterOutputStream中的PrintStream
+这是一个打印类，可以将指定的各种基础类型，包括字符串打印到文件，控制台等。如：
+pStr = new PrintStream("c.txt");
+pStr.println("what a fine day");
+
+8:java 控制台变量赋值
+最初我用的是如下的程序：
+		try{
+			int x1,y1,z1;
+			BufferedInputStream buf = new BufferedInputStream(System.in);
+			DataInputStream data = new DataInputStream(buf);
+			System.out.println("This is in the dataInputStream");
+			x1 = data.readInt();
+			y1 = data.readInt();
+			z1 = data.readInt();
+			System.out.println("x,y,z is:" + x1 +" " + y1 + " " + z1);
+		}catch(Exception e)
+		{}
+控制台输入：12 34 45 
+显示结果是：x,y,z is:825368627 874525749 218771725
+很明显这不是自己想要的结果，后来，我修改程序，
+		try
+		{
+			byte[] bts = GetNumber(825368627);
+			for(byte c:bts)
+			{
+				System.out.println((char)c);
+			}
+		}catch(Exception e)
+		{}
+	static byte[] GetNumber(int b)
+	{
+		byte[] bt = new byte[4];
+		bt[0] = (byte)(b>>24);
+		bt[1] = (byte)(b>>16);
+		bt[2] = (byte)(b>>8);
+		bt[3] = (byte)b;
+		return bt;
+	}
+输出结果：1 2 3，
+从中可以说明我们在java的控制台中输入的数字其实是字符，我们输入12" "3这个字符，最后得到的数字825368627是因为将字符1,2，空格，3依次转换成字符对应的数字，并按顺序分别置于32位中的高8位，次高8位，次次高8位，低8位。
+
+
+解决方案，java的包 java.util.*中提供了Scanner类，利用Scanner类可以将方便的通过控制台给变量赋值
+		System.out.println("Please input the words");
+		int x,y,z;
+		try
+		{
+			Scanner in = new Scanner(System.in);
+			x = in.nextInt();
+			y = in.nextInt();
+			z = in.nextInt();
+			System.out.println("x,y,z is:" + x +" " + y + " " + z);
+			String str = in.next();
+			System.out.println(str);
+		}catch(Exception e)
+		{
+			
+		}
+
+9：StreamTokenizer
+通过判断字段 ttype =TT_EOF， TT_EOL， TT_WORD ，TT_NUMBER，通过这些标记来把行，数字，字符串分开。通过sval，nval字段值来获取token当前获取的字符串值或double值。程序如下所示：
+		StreamTokenizer st = null;
+		try
+		{
+			st = new StreamTokenizer(new FileReader("a.txt"));
+			//st.slashSlashComments(true);
+			//st.slashStarComments(true);
+			while(st.nextToken() != StreamTokenizer.TT_EOF)
+			{
+				System.out.println("the line is:"+ st.lineno());
+				if(st.ttype == StreamTokenizer.TT_WORD)
+				{
+					System.out.println(st.sval);
+				}
+				if(st.ttype == StreamTokenizer.TT_NUMBER)
+				{
+					System.out.println(st.nval);
+				}
+			}
+		}catch(FileNotFoundException fp)
+		{	
+		}catch(IOException e)
+		{ 
+		}
+
+10 File类
+File是操作文件的类，功能包括文件的遍历，创建，删除，以及问价的可读，可写等各种属性，它跟java.nio.Path类似，都是提供关于文件路径的相关操作，其中两个可以相互转换。
+11  java.nio.file
+Files提供对path的各种操作，都是各种静态函数，通过静态函数来完成对path，directory的创建，删除，添加，移动，判断是否存在的各种操作。
+		File directory = new File("");//设定为当前文件夹
+		try{
+		    System.out.println(directory.getCanonicalPath());//获取标准的路径
+		    System.out.println(directory.getAbsolutePath());//获取绝对路径
+		}catch(Exception e){}
+		
+		System.out.println(System.getProperty("user.dir"));//user.dir指定了当前的路径
