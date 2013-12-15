@@ -1,0 +1,237 @@
+1：java寻找类
+当我们初始化一个类的实例的时候，java虚拟机会查找并且加载这个类。当然用Class.forName("xxx"),用来查找和加载一个类，返回一个句柄来控制这个类的其他操作，比如产生一个实例。
+try{
+Class x = Class.forName("xx");
+Object y = x.newInstance(); //newInstance 返回Object句柄，并且类的构造函数必须没有任何参数
+}catch(InstantiationException e)
+{			
+}catch(IllegalAccessException e)
+{			
+}
+catch(ClassNotFoundException e)
+{
+	e.printStackTrace();
+}
+
+2：判断对象是否是类的实例
+方法一：
+TestClass x = new TestClass();
+if( x instanceof TestClass)
+方法二：
+if（TestClass.class.isInstance（x））
+
+毫无疑问方法2是一种优势，可以避免修改代码
+3：类Class
+public final class Class<T>
+extends Object
+implements Serializable, GenericDeclaration, Type, AnnotatedElement
+之前用到的Class.forName("xx"); 其中的Class就是一个类，很奇怪吧，Class的实例表示正在运行的类或者接口。Class没有公共构造函数，Class的对象是被java虚拟机自动的构造当类被加载并且调用。
+java 中并不是一开始就加载所有的类，而是用到什么就加载什么，所以一个类在第一次调用时时候会产生这个类的Class 对象，记住是Class对象，而不是类的实例，当我们再次实例化这个类的时候，用的就是这个Class的object。
+			Class x =Class.forName("Cookie");
+			Object yy = x.newInstance();
+			System.out.println("the class name is:"+x.getName());
+			Class z = Cookie.class;
+			System.out.println(x);
+			System.out.println(z);
+			System.out.println( x == z);
+结果：
+class Cookie
+class Cookie
+true
+
+例子2：
+class TestX
+{}
+interface faceX
+{}
+interface faceY
+{}
+class TestY extends TestX implements faceX,faceY
+{}
+public class ClassAndInterface {
+	public static void main(String[] args)
+	{
+		Class Obj = null;
+		try
+		{
+			Obj = Class.forName("TestY");
+		}catch(ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		Class[] faces = Obj.getInterfaces();
+		for(int i =0;i<faces.length;i++)
+			System.out.println(faces[i]);
+		Class cf = Obj.getSuperclass();
+		Object Osu = null;
+		try{
+			Osu = cf.newInstance();
+		}catch(InstantiationException ie)
+		{
+		}catch(IllegalAccessException ie)
+		{}
+		System.out.println(Osu);
+	}
+}
+从这个例子可以看出我们可以利用Class类来知道类的祖宗十八代的信息。
+
+4:类的标记
+Class X{}；
+X.class代表的就是Class的object。
+
+5:java的反射机制
+java的反射机制就是在运行时获取一个类的各种信息，包括字段，函数，构造函数。可对一个编译期完全未知的对象进行实际的设置以及发出方法调用。
+
+6：java 函数参数的传递
+java中函数中传递的是句柄，在函数内部对句柄是复制的，但是即便复制了句柄，不同的句柄所指向的内存还是一样的，所以这个时候就相当于C++ 的传引用调用，这个时候传递参数的话，那么就会对函数外部的对象产生一些额外的影响。
+public class CObject {
+	int i;
+	CObject(int i)
+	{
+		this.i = i;
+	}
+	public static void main(String[] args)
+	{
+		CObject x = new CObject(2);
+		CObject y = x;
+		x.i++;
+		System.out.println("X's i ="+x.i);
+		System.out.println("Y's i ="+y.i);
+		System.out.println(x);
+		System.out.println(y);
+	}
+}
+7：java的clone
+为了解决参数句柄传递时发生的类似C++中的传引用的副作用，我们引入了对象的Clone概念。所谓的对象Clone就是把对象完全复制，然后只针对这个对象进行操作。Clone是Object类的protected函数
+protected Object clone（）throws CloneNotSupportException 
+因此要在类的外部调用clone函数，必须重载Object的clone函数，并且将其设为public函数，并且在重载的时候要注意调用super.clone().
+其次就是实现java.lang 中的Cloneable接口，这个接口是奇怪的，因为它是空的，interface Cloneable{}，我们实现它，其实就可以在原理上利用 if myHanble instanceof Cloneable，这样的判断，去判断一个类是否可以被clone。
+
+8：clone中的浅clone 和深 clone
+当我们进行clone的时候，如果对象中包含类对象，那么在进行clone的时候，一定要记得将成员类实例进行clone。例如下面的例子：
+public class Snake implements Cloneable{
+	private Snake next;
+	private char c;
+	Snake(int i,char x)
+	{
+		c = x;
+		if(--i > 0)
+			next = new Snake( i,(char)(x+1) );
+	}
+	
+	void increment()
+	{
+		c++;
+		if(next != null)
+			next.increment();
+	}
+	
+	public String toString()
+	{
+		String s = ":" + c;
+		if(next!=null)
+			s += next.toString();
+		return s;	
+	}
+	
+	public Object clone()
+	{
+		Object Obj = null;
+		try
+		{
+			Obj = super.clone();
+		}catch(CloneNotSupportedException ce)
+		{
+			System.out.println("Cann't clone this object");
+		}
+		return Obj;
+	}
+
+	public static void main(String[] args)
+	{
+		Snake s1 = new Snake(5,'a');
+		System.out.println("s1 is:" + s1);
+		Snake s2 = (Snake)s1.clone();
+		System.out.println("s2 is:" + s2);
+		s1.increment();
+		System.out.println("Now after s1 increace s2 is:" + s2);
+		
+	}
+}
+运行结果如下所示：
+s1 is::a:b:c:d:e
+s2 is::a:b:c:d:e
+Now after s1 increace s2 is::a:c:d:e:f
+
+从以上运行结构可以看出，我们的clone函数仅仅clone了Snake对象的第一个部分，所以s1运行increament后，s2的只有第一节a不变，后面的节数还是跟随着s1的变化产生了变化，所以进行clone的时候一定要注意其他类实例成员的clone，现在修改clone函数，如下所示：
+	public Object clone()
+	{
+		Snake Obj = null;
+		try
+		{
+			Obj = (Snake)super.clone();
+			if(Obj.next != null)
+				Obj.next = (Snake)Obj.next.clone();
+		}catch(CloneNotSupportedException ce)
+		{
+			System.out.println("doesn't support clone");
+		}
+		return Obj;
+	}
+通过上面的代码的修改，程序的运行结果如下所示：
+s1 is::a:b:c:d:e
+s2 is::a:b:c:d:e
+Now after s1 increace s2 is::a:b:c:d:e
+可以看到s2没有随着s1的变换而发生变化，从而达到了我们的预期目标。
+
+
+9：继承类的clone
+当一个继承类的父类有可以调用的clone函数时候我，我们并不需要重新改写clone函数即便我们在继承函数中增加了新的字段，这是因为Object.clone会自动识别是继承类调用的clone函数，那么就会自动复制继承类中新增加的字段。如下程序所示：
+import java.util.*;
+class Int2 implements Cloneable {
+	private int i;
+	public Int2(int ii) { i = ii; }
+	public void increment() { i++; }
+	public String toString() {
+		return Integer.toString(i);
+	}
+	public Object clone() {
+		Object o = null;
+		try {
+			o = super.clone();
+		} catch (CloneNotSupportedException e) {
+			System.out.println("Int2 can't clone");
+		}
+		return o;
+	}
+}
+class Int3 extends Int2 {
+	private int j; // Automatically duplicated
+	public Int3(int i) { super(i); }
+	public Int3(int i,int j){super(i);this.j = j;}
+	public String toString()
+	{
+		return Integer.toString(j);
+	}
+}
+
+public class AddingClone {
+	public static void main(String[] args) {
+		Int3 x3 = new Int3(1,7);
+		Int3 x4 = (Int3)x3.clone();
+		System.out.println("x3.j = "+x3 +"x4.j = "+x4);
+	}
+}
+结果：
+x3.j = 7x4.j = 7
+说明继承类Int3中自动完成了新增加字段j的复制，即便Int3中，没有改写父类Int2的clone函数
+
+10：clone 和对象的序列化
+java对象序列化就是把对象在内存中的状态转变成字节序列保存起来，反序列化就是把对象从保存的字节中恢复出来，通过Inputstream，OutputStream，ObjectInputStream,ObjectInputStream流对象来操作。
+其实对象的反序列化经历的就是一个clone的过程，但是它用的 时间比clone长并且不稳定。
+
+11：clone的关闭
+当一个类具有clone功能的时候，其子类都会继承这种clone功能，但是有时候处于安全我们想关闭clone功能时，可以采用一些方法：
+	重新改写clone，使其为空；
+	使clone抛出CloneNotSupportedException等方法
+
