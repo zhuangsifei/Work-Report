@@ -1,0 +1,198 @@
+1：java GUI框架类型
+一种是比较老的AWT框架，一种是新的Swing框架。awt（Abstract window toolkit）的消息机制是基于分层处理的，事件沿着层次结构沿着
+
+容器的上方传递。自从java1.1开始，java开始采用新的事件处理模型，采用委托事件模型。
+
+2：委托事件处理
+事件源与事件处理程序分开，其实就是建立一种事件源，监听器的模式，事件源就是产生消息的源头，指的是Button，Checkbox ，
+
+CheckboxGroup，Choice，List，TextArea，TextField，Menu等各种各样的空间。
+监听器就是各种各样的接口，程序要处理相应的时间就必须实现这些接口。
+事件处理的逻辑步骤，（1）事件源添加监听器（2）实现监听器的接口。
+
+3：事件类型，监听器相关接口
+事件			监听器
+ActionEvent		ActionListener
+AdjustmentEvent		AdjustmentListener
+ComponentEvent		ComponentListener
+Containe rEvent		ContainerListener
+FocusEvent		FocusListener
+KeyEvent		KeyListener
+MouseEvent		MouseListener
+WindowEvent		WindowListener
+ItemEvent		ItemListener
+TextEvent		TextListener
+事件添加以及删除函数，形式都如下所示：
+addActionListener(  )		//添加监听器
+removeActionListener(   )	//删除监听器
+每个事件监听器都有一个或者几个接口，当implements interface时必须实现所有的的监听器的接口函数，即便函数什么也不做，为了减少
+
+这种写空函数的麻烦，java为监听器中函数多于一个提供了一个适配器，适配器里面有默认的函数，需要的时候仅仅重写需要重写的函数即
+
+可，如下所示：
+	class MyWindowListener extends WindowAdapter {
+		public void windowClosing(WindowEvent e) {
+		System.exit(0);
+			}
+	}
+4：applet 
+applet是可以在HTML网页中运行的程序，它在运行的时候会有安全限制，它可以不需要main函数，一个典型的applet程序如下所示：
+ 	import java.awt.*;
+	import java.applet.*;
+	public class Applet1 extends Applet {
+	public void paint(Graphics g) {
+		g.drawString("First applet", 10, 10);
+		}
+	} ///:~
+所有public类必须继承Applet类，Applet中主要的方法有 init（），start(),paint(),stop(),destroy(),
+init 在程序片被创建时候调用；start在程序片进入web浏览器后调用，是在Init之后；stop是在程序片离开浏览器中的视野时关闭响应操作
+
+；destroy是在程序片不再被需要时销毁程序片。
+
+5：常用组件类型
+（1）Button 按键
+	public Button（）；public Button（String label）；
+（2）TextFiled 输入框
+	TextField()；TextField(int columns)；TextField(String text)；TextField(String text, int columns)
+（3）TextArea 文本输入区域
+	TextArea（）；TextArea（int rows，int columns）；TextArea(String text);
+	TextArea(String text,int rows,int columns);TextArea(String text,int rows,int columns,int scrollbars);
+（4）Lable 标签
+	Label（）；Label（String text）；Label（String text，int alignment）
+（5）Checkbox 复选框
+	Checkbox()；Checkbox(String label)；Checkbox(String label, boolean state)；
+	Checkbox(String label, boolean state, CheckboxGroup group)；
+	Checkbox(String label, CheckboxGroup group, boolean state)；
+（6）CheckboxGroup 单选按钮
+	CheckboxGroup()
+	它把Checkbox 放在一起，如下所示：
+	CheckboxGroup cbg = new CheckboxGroup();
+ 	add(new Checkbox("one", cbg, true));
+ 	add(new Checkbox("two", cbg, false));
+ 	add(new Checkbox("three", cbg, false));
+（7）Choice 下拉列表
+	Choice（）；
+	点击会会出现一个下拉列表，可以向其中添加Item，如下程序所示：
+	Choice ColorChooser = new Choice();
+ 	ColorChooser.add("Green");
+ 	ColorChooser.add("Red");
+ 	ColorChooser.add("Blue");
+（8）List 列表框
+	List（）；List（int rows）；List（int rows，boolean multipleMode）；//是否允许多个选择，默认是单选的
+
+6：古老的事件处理
+	applet中 的消息处理函数基本都是继承自 Class Component，
+	public boolean action(Event evt,Object what)；
+	handleEvent（）；
+	例子如下，因为他们不是不是面向对象的，也没有switch-case语句，所以就必须调用复杂的if-else语句，并且还得返回父类的程
+
+序，例子如下：
+	public boolean action (Event evt, Object arg) {
+		if(arg.equals("Button 1"))
+			getAppletContext().showStatus("Button 1");
+		else if(arg.equals("Button 2"))
+			getAppletContext().showStatus("Button 2");
+		// Let the base class handle it:
+		else 
+			return super.action(evt, arg);
+	return true; // We've handled it here
+	}
+	
+handleEvent 是单独处理一个对象的一个时间，当一些action不方便处理的事情就可以通过handleEvent来处理，因为它是原子性质的。下面
+
+的两段代码将是等价的：
+public boolean action (Event evt, Object arg) {
+if(evt.target.equals(lst)) {
+t.setText("");
+String[] items = lst.getSelectedItems();
+for(int i = 0; i < items.length; i++)
+t.appendText(items[i] + "\n");
+}
+else if(evt.target.equals(b)) {
+if(count < flavors.length)
+lst.addItem(flavors[count++], 0);
+}
+else 
+return super.action(evt, arg);
+return true;
+}
+} ///:~
+*************************************************************************
+		public boolean handleEvent(Event evt) {
+			if(evt.id == Event.LIST_SELECT ||
+			evt.id == Event.LIST_DESELECT) {
+			if(evt.target.equals(lst)) {
+			t.setText("");
+			String[] items = lst.getSelectedItems();
+			for(int i = 0; i < items.length; i++)
+			t.appendText(items[i] +"\n");
+			}
+			else 
+			return super.handleEvent(evt);
+			} 
+			else 
+			// must return super.handleEvent(evt);
+			return super.handleEvent(evt);
+			return true;
+			}
+			public boolean action(Event evt, Object arg) {
+			if(evt.target.equals(b)) {
+			if(count < flavors.length)
+			lst.addItem(flavors[count++], 0);
+			}
+			else 
+			return super.action(evt, arg);
+			return true;
+			}
+并且必须强调的是handle中的最后一个必须返回super.handle(evt);因为必须把handle中不想处理的事情交给父类，要不然例子中的action
+
+将不会被执行。
+7：布局
+java中的布局有多个，我们可以采取各种各样的布局，是界面呈现自己想要的姿态
+（1）FlowLayout：
+	按照顺序依次排放各个组件
+（2）BorderLayout
+	将整个布局分为上下左右中五个部位
+（3）GridLayout
+	将整个布局分为m×n块均匀大小
+（4）CardLayout
+	一个平面上所有的组件重合，但是某一个时刻只有一个是被及激活的。通过下面这样的方式来改变激活重合的组件。
+	if (evt.target.equals(first)) {
+		cl.first(cards);
+	} 
+	else if (evt.target.equals(second)) {
+		cl.first(cards);
+		cl.next(cards);
+	} 
+	else if (evt.target.equals(third)) {
+		cl.last(cards);
+	}  
+8：程序片applet的限制
+applet出于安全机制考虑，它不能访问本地磁盘，不能拥有菜单，对话框不被信任；
+
+9：新的事件委托事件函数
+新的事件处理机制采用事件源和监听器的模式，程序如下所示：
+class B1 implements ActionListener {
+	public void actionPerformed(ActionEvent e) {
+		t.setText("Button 1");
+	}
+}
+通过设置内部类来实现UI和事件处理相互分离的作用
+
+10：applet 和 窗口程序的结合
+通过在类中添加一个main函数就可以将程序变成一个既能在HTML中运行的程序片，又能在桌面中运行的程序片。
+public static void main(String[] args) {
+TextNew applet = new TextNew();
+Frame aFrame = new Frame("TextNew");
+aFrame.addWindowListener(
+new Win dowAdapter() {
+public void windowClosing(WindowEvent e) {
+System.exit(0);
+}
+});
+aFrame.add(applet, BorderLayout.CENTER);
+aFrame.setSize(300,200);
+applet.init();
+applet.start();
+aFrame.setVisible(true);
+} 
