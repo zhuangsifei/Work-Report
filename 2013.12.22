@@ -1,0 +1,296 @@
+java的Swing库采用Beans的方式允许我们更加方便的创建界面。
+
+1：进度条
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.border.*;
+public class Progress extends JPanel {
+	JProgressBar pb = new JProgressBar();			//进度条
+	JSlider sb = new JSlider(JSlider.HORIZONTAL, 0, 100, 60);//滑动条
+	public Progress() {
+		setLayout(new GridLayout(2,1));
+		add(pb);
+		sb.setValue(0);
+		sb.setPaintTicks(true);
+		sb.setMajorTickSpacing(20); //设置滑动条的主间隔个数
+		sb.setMinorTickSpacing(5);  //每个间隔细分为5个间隔
+		sb.setBorder(new TitledBorder("Slide Me"));
+		pb.setModel(sb.getModel()); // Share model
+		add(sb);
+	}
+	public static void main(String args[]) {
+		JFrame jf = new JFrame();
+		Progress pro = new Progress();
+		jf.add(pro);
+		jf.setSize(200,300);
+		jf.setVisible(true);
+	}
+} ///:~
+
+2：ButtonGroup以及动态映射
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.*;
+import java.lang.reflect.*;
+public class ButtonGroups extends JPanel {
+	static String[] ids = { 
+		"June", "Ward", "Beaver","Wally", "Eddie", "Lumpy",
+	};
+	static JPanel makeBPanel(Class bClass, String[] ids) {
+		ButtonGroup bg = new ButtonGroup();
+		JPanel jp = new JPanel();
+		String title = bClass.getName();
+		title = title.substring( title.lastIndexOf('.') + 1);
+		jp.setBorder(new TitledBorder(title));
+		for(int i = 0; i < ids.length; i++) {
+			AbstractButton ab = new JButton("failed");
+			try {
+				//动态获得一个有一个String参数的构造函数
+				Constructor ctor = bClass.getConstructor(new Class[] { String.class });
+				//创造一个Object
+				ab = (AbstractButton)ctor.newInstance(new Object[]{ids[i]});
+			} catch(Exception ex) {
+				System.out.println("can't create " + bClass);
+			}
+			bg.add(ab);//按钮组添加按钮
+			jp.add(ab);
+		}
+		return jp;
+	}
+	public ButtonGroups() {
+		add(makeBPanel(JButton.class, ids));
+		add(makeBPanel(JToggleButton.class, ids));
+		add(makeBPanel(JCheckBox.class, ids));
+		add(makeBPanel(JRadioButton.class, ids));
+	}
+	public static void main(String args[]) {
+		JFrame jf = new JFrame();
+		ButtonGroups btg = new ButtonGroups();
+		jf.add(btg);
+		jf.setSize(500,300);
+		jf.setVisible(true);
+	}
+} ///:~
+这个程序的特点就是通过reflect来实现添加不同类型的按钮组，AbstractButton 是所有不同类型的button的父类，所以可以通过它来操作子类的重定义函数。通过Constructor ctor = bClass.getConstructor(new Class[] { String.class });来获得有一个参数是String类型的构造函数，通过ab = (AbstractButton)ctor.newInstance(new Object[]{ids[i]});来创建一个button的对象。
+ButtonGroup的作用就是一个button组中有一个被选中其他button就处于落选状态。
+
+3：按钮图标
+static Icon face = new Icon（"face0.jpg"）;//建立图标
+JButton jb = new JButton（"bt",face）;	   //建立带有图标的按钮
+jb.setIcon(face);//设置图标
+jb.setRolloverIcon(faces[1]);//设置滚动时的按钮图标
+jb.setPressedIcon(faces[2]); //设置按下时的按钮图标
+jb.setDisabledIcon(faces[4]);//设置禁用时的按钮图标
+
+4:弹出菜单
+弹出菜单也很简单，包括菜单的创建，菜单命令的响应，如下所示：
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+public class Popup extends JPanel {
+	JPopupMenu popup = new JPopupMenu();
+	JTextField t = new JTextField(10);
+	public Popup() {
+		add(t);
+		ActionListener al = new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				t.setText( ((JMenuItem)e.getSource()).getText());
+			}
+		};
+		JMenuItem m = new JMenuItem("Hither");
+		m.addActionListener(al);
+		popup.add(m);
+		
+		m = new JMenuItem("Yon");
+		m.addActionListener(al);
+		popup.add(m);
+		
+		m = new JMenuItem("Afar");
+		m.addActionListener(al);
+		popup.add(m);
+		popup.addSeparator();
+		
+		m = new JMenuItem("Stay Here");
+		m.addActionListener(al);
+		popup.add(m);
+		
+		PopupListener pl= new PopupListener();
+		addMouseListener(pl);
+		t.addMouseListener(pl);//这样即便鼠标点击label，也会弹出菜单
+	}
+	class PopupListener extends MouseAdapter {
+		
+		public void mousePressed(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+		
+		public void mouseReleased(MouseEvent e) {
+			maybeShowPopup(e);
+		}
+		
+		private void maybeShowPopup(MouseEvent e) {
+			//判断鼠标事件是否为弹出菜单的触发事件
+			if(e.isPopupTrigger()) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		}
+	}
+	public static void main(String args[]) {
+		JFrame jf = new JFrame();
+		Popup pm = new Popup();
+		jf.add(pm);
+		jf.setSize(500,500);
+		jf.setVisible(true);
+	}
+} ///:~
+通过鼠标监听器来监听弹出菜单事件，e.isPopupTrigger()来判断是否是弹出菜单的触发事件；popup.show(e.getComponent(), e.getX(), e.getY());在点击鼠标的位置显示弹出菜单；
+
+5:树形控件
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.tree.*;
+// Takes an array of Strings and makes the first
+// element a node and the rest leaves:
+class Branch {
+	DefaultMutableTreeNode r;
+	public Branch(String[] data) {
+		r = new DefaultMutableTreeNode(data[0]);
+		for(int i = 1; i < data.length; i++)
+			r.add(new DefaultMutableTreeNode(data[i]));
+	}
+	public DefaultMutableTreeNode node() { 
+		return r; 
+	}
+} 
+public class Trees extends JPanel {
+	String[][] data = {
+			{ "Colors", "Red", "Blue", "Green" },
+			{ "Flavors", "Tart", "Sweet", "Bland" },
+			{ "Length", "Short", "Medium", "Long" },
+			{ "Volume", "High", "Medium", "Low" },
+			{ "Temperature", "High", "Medium", "Low" },
+			{ "Intensity", "High", "Medium", "Low" },
+		};
+	static int i = 0;
+	DefaultMutableTreeNode root, child, chosen;
+	JTree tree;
+	DefaultTreeModel model;
+	public Trees() {
+		setLayout(new BorderLayout());
+		root = new DefaultMutableTreeNode("root");//建立树的根节点
+		tree = new JTree(root);//建立一棵树
+		// Add it and make it take care of scrolling:
+		add(new JScrollPane(tree), BorderLayout.CENTER);
+		// Capture the tree's model:
+		model =(DefaultTreeModel)tree.getModel();
+		JButton test = new JButton("Press me");
+		test.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e){
+				if(i < data.length) 
+				{
+					//通过Branch建立子节点的所有节点
+					child = new Branch(data[i++]).node();
+					// What's the last one you clicked?
+					chosen = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+					if(chosen == null)
+						chosen = root;
+					// The model will create the appropriate event. In 
+					// response, the tree will update itself:
+					model.insertNodeInto(child, chosen, 0);
+					// This puts the new node on the currently chosen node.
+				}
+			}
+		});
+		// Change the button's colors:
+		test.setBackground(Color.blue);
+		test.setForeground(Color.white);
+		JPanel p = new JPanel();
+		p.add(test);
+		add(p, BorderLayout.SOUTH);
+	}
+	public static void main(String args[]) {
+		JFrame jf = new JFrame();
+		Trees nt = new Trees();
+		jf.add(nt);
+		jf.setSize(1000,1000);
+		jf.setVisible(true);
+	}
+} ///:~
+
+程序中通过Branch来建立一个分支，这个分支是两层的，包含一个根节点以及几个叶子节点；
+通过按钮PressMe来负责树形控件中节点的插入，
+chosen = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();这句话获取最后选择的节点，插入会在此节点下插入；
+model.insertNodeInto(child, chosen, 0);这句话表示插入分支child，插入位置是chosen，0表示插在它下面的第一个位置
+
+6：表格的创建
+java中表格的创建还是比较方便的，我们只需要实现interface TableModel中的三个主要的函数即可，所以我们要用到抽象类
+AbstracttableModel,这个类实现了tableModel 中的大部分函数，但是三个函数
+ public int getRowCount();
+ public int getColumnCount();
+ public Object getValueAt(int row, int column);
+需要我们另外独自去实现。下面的程序很好的说明了这一点：
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.table.*;
+import javax.swing.event.*;
+// T he TableModel controls all the data:
+class DataModel extends AbstractTableModel {
+	Object[][] data = {
+			{"one", "two", "three", "four"},
+			{"five", "six", "seven", "eight"},
+			{"nine", "ten", "eleven", "twelve"},
+	};
+	// Prints data when table changes:
+	class TML implements TableModelListener {
+		public void tableChanged(TableModelEvent e) {
+			for(int i = 0; i < data.length; i++) {
+				for(int j = 0; j < data[0].length; j++)
+					System.out.print(data[i][j] + " ");
+				System.out.println();
+			}
+		}
+	}
+	DataModel() {
+		addTableModelListener(new TML());
+	} 
+	//必须完成interface TableModel的函数
+	public int getColumnCount() { 
+		return data[0].length; 
+	}
+	//必须完成interface TableModel的函数
+	public int getRowCount() { 
+		return data.length;
+	}
+	//必须完成interface TableModel的函数
+	public Object getValueAt(int row, int col) { 
+		return data[row][col]; 
+	}
+	public void setValueAt(Object val, int row, int col) {
+		data[row][col] = val;
+		// Indicate the change has happened:
+		fireTableDataChanged();
+	}
+	public boolean isCellEditable(int row, int col) { 
+		return true; 
+	}
+}; 
+public class Table extends JPanel {
+	public Table() {
+		setLayout(new BorderLayout());
+		JTable table = new JTable(new DataModel());
+		JScrollPane scrollpane = JTable.createScrollPaneForTable(table);
+		add(scrollpane, BorderLayout.CENTER);
+	}
+	public static void main(String args[]) {
+		JFrame jf = new JFrame();
+		Table ta = new Table();
+		jf.add(ta);
+		jf.setSize(300,300);
+		jf.setVisible(true);
+	}
+} ///:~
