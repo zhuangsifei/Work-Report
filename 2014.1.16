@@ -1,0 +1,230 @@
+今天修改代码以及钻研了安卓的guan官方文档，整理成笔记如下所示：
+
+
+在安卓系统启动安卓组件之前，系统必须知道app中使用了哪些组件，这些组件是在AndroidManifest.xml文件中声明的，安卓系统通过读取这个文件就了解了声明的组件，manifest文件必须在app工程的根目录下面。
+1	manifest 做的事情
+（1）声明用户的一些权限
+例如，你想读取手机中的多媒体资源-电话，图片等，你就必须在这里声明，你要用到他们
+（2）声明最低的API版本
+（3）声明app用到的硬件或者软件的特征
+例如照相机，蓝牙，多触点屏幕
+（4）声明app需要用链接到的API库
+例如google API
+2	manifest的格式
+
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest>
+
+    <uses-permission />
+    <permission />
+    <permission-tree />
+    <permission-group />
+    <instrumentation />
+    <uses-sdk />
+    <uses-configuration />  
+    <uses-feature />  
+    <supports-screens />  
+    <compatible-screens />  
+    <supports-gl-texture />  
+
+    <application>
+
+        <activity>
+            <intent-filter>
+                <action />
+                <category />
+                <data />
+            </intent-filter>
+            <meta-data />
+        </activity>
+
+        <activity-alias>
+            <intent-filter> . . . </intent-filter>
+            <meta-data />
+        </activity-alias>
+
+        <service>
+            <intent-filter> . . . </intent-filter>
+            <meta-data/>
+        </service>
+
+        <receiver>
+            <intent-filter> . . . </intent-filter>
+            <meta-data />
+        </receiver>
+
+        <provider>
+            <grant-uri-permission />
+            <meta-data />
+            <path-permission />
+        </provider>
+
+        <uses-library />
+
+    </application>
+
+</manifest>
+manifest.xml文件中先以manifest标签开始，有2个直系节点，基本配置，应用配置
+
+（1）manifest标签
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="string"
+          android:sharedUserId="string"
+          android:sharedUserLabel="string resource" 
+          android:versionCode="integer"
+          android:versionName="string"
+          android:installLocation=["auto" | "internalOnly" | "preferExternal"] >
+    . . .
+</manifest>
+manifest中里面必须包含一个<application>，以及xmlns:android 和 package attributes.
+<1>xmlns:android
+定义一个安卓的namespace，通常是"http://schemas.android.com/apk/res/android"
+<2>package
+一个完整的java命名规则的包，就是你application的那个包。包中可以包含大小写字母，数字，下划线，但是只能以小写字母开头。
+程序一旦发布，就不能更改包名，因为你的包名被认为是独一无二的，用户依靠此来进行更新，一旦你的包名改变，用户就无法进行更新了。
+<3>android:sharedUserId
+默认情况下，安卓会为每一个用户分配一个独一无二的userId。但是如果几个apk的useId设置的一样的话，他们就可以访问相互的数据，打扰进程间共享数据的功能。
+<4>android:sharedUserLabel
+shared user ID中user-readable 标签，这个标签必须是string resource中引用的，不可以是一个原始的string
+<5>android:versionCode
+这是一个整数，用来表示版本新旧，但这个整数不是展现给用户看的，展现给用户看到的是android：versionName
+<6>android：versionName
+展示给用户看到的，可以是一个原始的字符串，也可以是从string resource中引用的。
+<7>android:installLocation
+应用程序默认的安装路径。
+	"internalOnly"：只能安装在内存中，内存满了，应用程序就不能被系统安装
+	"auto"：	系统默认的安装在内存中，但是内存满了它可以被安装在SD卡中
+	"preferExternal"：优先安装在SD卡中，SD卡满的话可以安装在内存中
+对于auto和preferExternal来说，安装之后，程序可以被移动到SD卡或者内存中，通过系统设置。
+还有需要注意的是即便应用程序被安装在SD卡，仍然会有一部分数据（应用程序数据，比如说数据库）会被安装在内存中。
+（2）<uses-permission>
+<uses-permission android:name="string"
+        android:maxSdkVersion="integer" />
+这个不用多说，就是制定aplication是否具有访问手机上各种资源的权限，以及SDK的最高支持版本。如：
+<uses-permission
+     android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+     android:maxSdkVersion="18" />
+（3）<permission>
+语法：
+<permission android:description="string resource"
+            android:icon="drawable resource"
+            android:label="string resource"
+            android:name="string"
+            android:permissionGroup="string"
+            android:protectionLevel=["normal" | "dangerous" | 
+                                     "signature" | "signatureOrSystem"] />
+这个是用来声明受保护的各种对象，数据，组件的。
+受保护的东西既有系统声明过的，也可是是自己的程序的。如果是系统中有的，就不需要用<permision>来声明，如果是保护自己程序的，那么就得声明保护的是什么东西。
+如：
+ <permission android:name="com.example.project.DEBIT_ACCT" . . . />
+ <uses-permission android:name="com.example.project.DEBIT_ACCT" />
+注意到了即便是application它自己，如果它要用到manifest中声明的保护对象，它也要request一下的。
+（4）<permission-tree>
+声明权限树的基本名称，利用权限树可以动态的添加和删除一些权限PackageManager.addPermission。如果基名是com.example.project.taxes，那么我们就可以添加诸如下面的这些权限
+com.example.project.taxes.CALCULATE 
+com.example.project.taxes.deductions.MAKE_SOME_UP 
+com.example.project.taxes.deductions.EXAGGERATE
+（5）permission-group
+<permission-group android:description="string resource"
+                  android:icon="drawable resource"
+                  android:label="string resource"
+                  android:name="string" />
+(6)uses-sdk
+<uses-sdk android:minSdkVersion="integer"
+          android:targetSdkVersion="integer"
+          android:maxSdkVersion="integer" />
+(7)uses-configuration
+<uses-configuration
+  android:reqFiveWayNav=["true" | "false"]
+  android:reqHardKeyboard=["true" | "false"]
+  android:reqKeyboardType=["undefined" | "nokeys" | "qwerty" | "twelvekey"]
+  android:reqNavigation=["undefined" | "nonav" | "dpad" | "trackball" | "wheel"]
+  android:reqTouchScreen=["undefined" | "notouch" | "stylus" | "finger"] />
+用来声明所需的硬件或者软件的配置
+（8）uses-feature
+<uses-feature
+  android:name="string"
+  android:required=["true" | "false"]
+  android:glEsVersion="integer" />
+用来声明application所需的一个单独的硬件或者软件配置
+（9）support-screens
+<supports-screens android:resizeable=["true"| "false"]
+                  android:smallScreens=["true" | "false"]
+                  android:normalScreens=["true" | "false"]
+                  android:largeScreens=["true" | "false"]
+                  android:xlargeScreens=["true" | "false"]
+                  android:anyDensity=["true" | "false"]
+                  android:requiresSmallestWidthDp="integer"
+                  android:compatibleWidthLimitDp="integer"
+                  android:largestWidthLimitDp="integer"/>
+指定application支持的尺寸，并且当屏幕的尺寸大于application支持的尺寸的时候开启兼容模式。对于一些应用或者游戏来说，只能支持某些屏幕大小的设备或者在某些设备中的效果比较好，我们就会使用<supports-screens>标签来指定支持的屏幕特征。
+（10）compatible-screens
+<compatible-screens>
+    <screen android:screenSize=["small" | "normal" | "large" | "xlarge"]
+            android:screenDensity=["ldpi" | "mdpi" | "hdpi" | "xhdpi"] />
+    ...
+</compatible-screens>
+这个元素用于指定那些屏幕配置跟应用程序是兼容的。在应用的清单中只允许有一个<compatible-screent>元素的实例，但是它能够包含多个<screen>元素。每个<screen>元素指定一个特定的跟应用程序兼容的尺寸---密度组合。
+（11）support-gl-texture
+<supports-gl-texture
+  android:name="string" />
+声明一个application所支持的gl纹理压缩格式
+（12）instrumentation
+<instrumentation android:functionalTest=["true" | "false"]
+                 android:handleProfiling=["true" | "false"]
+                 android:icon="drawable resource"
+                 android:label="string resource"
+                 android:name="string"
+                 android:targetPackage="string" />
+用来声明一个Instrumentation类，让你来监控application和system之间的交互，Instrumentation对象早于application的任何组件之前被实例化。
+（13）先说说app配置
+<application
+	<activity/>
+	<service/>
+	<receiver/>
+	<provide/>
+/applicatin>
+Activities, services, and content providers 这3个东西如果你在程序中用到但是不在manifest.xml中声明，那么你的程序将无法运行。但是broadcast receivers既可以在manifest中
+声明，又可以在代码中动态的创建并通过registerReceiver()在系统中注册。
+(14)<application>
+用来表明应用程序的各种声明，icon, label, permission, process, taskAffinity等等，它里面可以包含
+<activity> 
+<activity-alias> 
+<service> 
+<receiver> 
+<provider> 
+<uses-library>
+（14）activity
+http://developer.android.com/guide/topics/manifest/activity-element.html
+主要用来实现可视化用户接口的一部分，包括application的名字，图标等
+可以包含
+<intent-filter> 
+<meta-data>
+（15）intent-filter
+
+<intent-filter android:icon="drawable resource"
+               android:label="string resource"
+               android:priority="integer" >
+    . . .
+</intent-filter>
+必须包含action，可以包含category，data
+它用来指定activity, service, or broadcast receiver可以相应的intent的类型，intent-filter声明父组件（activity, service）可以做的事情，receiver可以处理的broadcasts 。它打开组件接受intent的类型，过滤掉对组件没有
+（16）action
+<action android:name="string" />
+所谓的action就是启动某项功能了，例如你要启动照相机，我们就可以在这里设置
+(17) data
+<data android:scheme="string"
+      android:host="string"
+      android:port="string"
+      android:path="string"
+      android:pathPattern="string"
+      android:pathPrefix="string"
+      android:mimeType="string" />
+
+（18）<meta-data>
+
+<meta-data android:name="string"
+           android:resource="resource specification"
+           android:value="string" />
+ 和intent-filter同等级，一个pair数据对，（name-value），可以给parent component提供任意的，附加的数据项。一个parent component可以包含任意数目的meta-data，他们所有的值都被收集到一个Bundle对象中。
