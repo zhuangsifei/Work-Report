@@ -1,0 +1,214 @@
+C#学习之类
+
+类与结构的区别：
+C++中结构与类的唯一区别是在于默认的访问级别，但是C#中的区别就稍微多了点，C#中如下
+(1)类是引用类型，结构是值类型。
+类中：
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+    public Person(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Person person1 = new Person("Leopold", 6);
+        Console.WriteLine("person1 Name = {0} Age = {1}", person1.Name, person1.Age);
+
+        // Declare  new person, assign person1 to it.
+        Person person2 = person1;
+
+        //Change the name of person2, and person1 also changes.
+        person2.Name = "Molly";
+        person2.Age = 16;
+
+        Console.WriteLine("person2 Name = {0} Age = {1}", person2.Name, person2.Age);
+        Console.WriteLine("person1 Name = {0} Age = {1}", person1.Name, person1.Age);
+
+        // Keep the console open in debug mode.
+        Console.WriteLine("Press any key to exit.");
+        Console.ReadKey();
+
+    }
+}
+/*
+    Output:
+    person1 Name = Leopold Age = 6
+    person2 Name = Molly Age = 16
+    person1 Name = Molly Age = 16
+*/
+
+public struct Person
+{
+    public string Name;
+    public int Age;
+    public Person(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+}
+结构中：
+public class Application
+{
+    static void Main()
+    {
+        // Create  struct instance and initialize by using "new".
+        // Memory is allocated on thread stack.
+        Person p1 = new Person("Alex", 9);
+        Console.WriteLine("p1 Name = {0} Age = {1}", p1.Name, p1.Age);
+
+        // Create  new struct object. Note that  struct can be initialized
+        // without using "new".
+        Person p2 = p1;
+
+        // Assign values to p2 members.
+        p2.Name = "Spencer";
+        p2.Age = 7;
+        Console.WriteLine("p2 Name = {0} Age = {1}", p2.Name, p2.Age);
+
+        // p1 values remain unchanged because p2 is  copy.
+        Console.WriteLine("p1 Name = {0} Age = {1}", p1.Name, p1.Age);
+
+        // Keep the console open in debug mode.
+        Console.WriteLine("Press any key to exit.");
+        Console.ReadKey();
+    }
+}
+/*
+  Output:
+    p1 Name = Alex Age = 9
+    p2 Name = Spencer Age = 7
+    p1 Name = Alex Age = 9
+*/
+(2)结构中可以包含构造函数，但是构造函数必须对全部字段赋值，因此结构没有默认构造函数
+(3)结构不能被继承，但是结构可以实现接口
+(4)结构直接继承自 System.ValueType，类继承自 System.Object
+(5)结构中除非是const或者static变量，或者不能直接对变量初始化
+namespace ConsoleApplication5
+{
+    struct struct1
+    {
+        //int x = 10;		//error
+        int x;
+        string str;
+
+        //struct1(){}		//error
+
+        //struct1(int _x)	//error
+        //{ x = _x; }
+
+        struct1(int _x, string _str)
+        {
+            x = _x;
+            str = _str;
+        }
+
+        const int y = 10;	//OK
+        static int z = 100;	//OK
+    }
+}
+(6)结构可以是Nullable类型
+所谓的Nullable类型就是System.Nullable<T>的实例，它的取值范围是值类型T可以表达的所有有效值 外加一个null值。
+Nullable存在的意义：值类型必须初始化后才能使用，为了让值类型不用初始化，就诞生了这个类型了。
+
+C# 类的继承
+（1）结构体不能被继承
+（2）基类的所有成员都会被派生类继承，但是private继承后不能被访问，其余类型都可以被访问。
+（3）类继承时的基类只能有1个，并且必须放在“：”的后面（紧挨着），后面可以跟多个接口
+（4）基类方法声明为virtual时，派生类可以利用override重写此方法
+public class Xt
+{
+	int xx;
+	public override string ToString()
+	{
+		return "what a fine day it is";
+	}
+}
+(5)基类的方法是abstract时候，派生类若不再是abstract class，则必须实现此方法。
+（6）通过sealed 来修饰类或者类成员
+当sealed 修饰类时候，此类被密封，从而不能做位其他类的基类
+public sealed Tc
+{
+	//...
+}
+当sealed用来修饰属性或者方法的时候，必须与override一起使用，表示是对方法的重写之后再也不能更改
+
+重写的方法必须是基于 virtual、abstract 或 override的。
+override 之后，表示派生类调用该同名方法时候不会调用基类中的，而是被重写的。
+  public sealed override string ToString()
+        {
+            //return base.ToString();
+            return "what a fine day iterator is";
+        }
+（7）用new来隐藏基类中的字段，属性，方法
+此时表示会把基类中具有相同签名的方法，同名的字段，属性给隐藏而不是重写，不一定要加new，但是不加new会出现报警。
+
+(8) new 和override的区别
+new 类似C++派生类中的重定义，override类似C++中类中的虚函数，通过基类的指针或者引用来调用，最后通过运行时确定调用具体哪个函数。
+
+示例：
+namespace ConsoleApplication5
+{
+    class Program1
+    {
+        public sealed override string ToString()
+        {
+            //return base.ToString();
+            return "what a fine day iterator is";
+        }
+
+        public void print(int x)
+        {
+            Console.WriteLine("this is int in Program1:{0}",x);
+        }
+        public virtual void print(string str)
+        {
+            Console.WriteLine("this is string in Program1:{0}",str);
+        }
+    
+    }
+
+    class Program2 : Program1
+    {
+        //public override string ToString() //error
+        //{
+        //    return "funck";
+        //}
+        public void print(int x)
+        {
+            Console.WriteLine("this is int in Program2:{0}",x);
+        }
+        public override void print(string str)
+        {
+            Console.WriteLine("this is string in Program2:{0}",str);
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Program1 A1 = new Program1();
+            Program1 A2 = new Program2();
+            A1.print(1);
+            A1.print("A");
+
+            A2.print(1);
+            A2.print("A");
+
+            Program2 B = new Program2();
+            B.print(1);
+            B.print("A");
+            
+            
+        }
+    }
+}
