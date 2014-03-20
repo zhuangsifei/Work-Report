@@ -1,0 +1,211 @@
+C# 学习总结 --类
+
+1：类定义
+<1>访问修饰符	
+internal：声明为内部类，只有当前项目中代码能够访问（默认的时候也是internal）
+public:	  公共类，其他项目中的代码可以访问
+protected：只有同一类或者结构或者此类的派生类代码才能访问
+private：  只有同一个类或者结构的代码可以访问该类型成员
+protected internal:
+
+细节：	（1）可以在命名空间中直接定义的类的访问修饰符只能是internal，public
+	（2）结构成员（包括嵌套class，struct）只能声明为 public，private，internal（struct不能继承，	  
+
+   	     所以没有protected）  
+	（3）类成员（包括嵌套class，struct）可以声明为public，private，protected，internal，protected 	  
+
+   internal 。
+	     类成员，包括嵌套类和结构默认为private。私有的嵌套类型不能被它的外围访问。
+	（4）继承的类不能比基类具有更高的访问级别
+	（5）关于protected internal，这个比较奇特，在同一个项目中（可以是不同命名空间），这个时候	  
+
+   protected internal 修饰的字段，内部类都可以被同一个项目中的其他代码访问，这个时候失去了	     
+
+protected的作用了，只有internal起用。
+	     当在另外一个项目中，这个时候就不能访问protected internal修饰的字段了，似乎是 protected和	  
+
+   internal同时起作用，但是在此时构造一个继承原来项目的类，那么在继承类中可以访问protected 	     
+
+internal 修饰的东西，这个时候似乎只有protected起作用了。
+
+<2>类成员
+类成员 const 常量以及static 成员他们是属于类的，不是属于对象的。
+
+<3>类属性
+属性是一种类的成员，它的实现类似函数，访问类似字段。它的作用是提供一种灵活和安全的机制来访问，修改私有字
+
+段。所以属性必须依赖于字段。
+private int dd;
+public int dd
+{
+	get{ return xx*3;}
+	set{ xx = value/3;}
+}
+没有set的属性是一种只读属性，没有get的访问器是一种只写属性。
+（1） get访问器用来返回字段或者计算 并返回字段，它必须以return或者throw终结。
+
+private string name;
+    public string Name
+    {
+        get
+        {
+            return name != null ? name : "NA";
+        }
+    }
+（2） set访问器类似返回类型为void的函数，使用value的隐式参数
+private string name;  // the name field
+    public string Name    // the Name property
+    {
+        get
+        {
+            return name;
+        }
+        set
+        {
+            name = value;
+        }
+    }
+（3） 访问器的限制
+属性访问标记可以为public,private,protected,internal,protected internal，
+因为访问器的访问限制必须比属性的访问限制更加严格，所以
+ 	private int xx;
+        public int sxx
+        {
+            public get { return xx; }//error
+            set { xx = value; }
+        }
+
+
+不能对接口或者显式的接口使用访问修饰符，因为接口里里面所有的默认是public的；
+同时具有get，set访问器时，才允许使用访问修饰符，并且只能有一个使用；
+如果属性有override修饰的时候，访问器修饰符必须与被重写的匹配。
+访问器的可访问级别必须比属性的可访问级别更加严格
+
+理解：首先第四条最容易想到，也是很合理的，毕竟是外围的决定内部的。
+      其次，既然第四条可以理解，那么如果只有一个访问器的时候，访问器访问级别等同属性，如果这个时候再去指  
+
+      定更加严格的访问级别，那么为何不当初在属性上指定呢？
+      这条理解了，那么为什么必须同时具有get，set才能添加访问修饰符就更加明确了。
+推理：接口中属性是public的，那么如果接口中只有一个get或者set的时候，我们可以在继承中指明另一个访问器的属  
+
+     性。但是如果接口中同时具有get，set，那么按照派生和继承的匹配性，这时候就不能这样再指定访问器的访问	
+
+限制了。
+public interface ISomeInterface
+{
+    int TestProperty
+    {
+        // No access modifier allowed here
+        // because this is an interface.
+        get;
+    }
+}
+
+public class TestClass : ISomeInterface
+{
+    public int TestProperty
+    {
+        // Cannot use access modifier here because
+        // this is an interface implementation.
+        get { return 10; }
+
+        // Interface property does not have set accessor,
+        // so access modifier is allowed.
+        protected set { }
+    }
+}
+
+（4）可以用static 修饰属性，以便随时访问
+private static int counter;
+public static int Counter
+    {
+        get { return counter; }
+    }
+
+（5）属性隐藏
+
+public class Employee
+{
+    private string name;
+    public string Name
+    {
+        get { return name; }
+        set { name = value; }
+    }
+}
+
+public class Manager : Employee
+{
+    private string name;
+
+    // Notice the use of the new modifier:
+    public new string Name // use new to hide property in base class
+    {
+        get { return name; }
+        set { name = value + ", Manager"; }
+    }
+}
+
+（6）virtual来修饰属性，派生类使用override来重写属性
+public class Parent
+{
+    public virtual int TestProperty
+    {
+      
+        protected set { }
+        get { return 0; }
+    }
+}
+public class Kid : Parent
+{
+    public override int TestProperty
+    {
+        protected set { }
+        get { return 0; }
+    }
+}
+(7) abstract 修饰属性，派生类来实现属性
+
+abstract class Shape
+{
+    public abstract double Area
+    {
+        get;
+        set;
+    }
+}
+
+class Square : Shape
+{
+    public double side;
+    public override double Area
+    {
+        get
+        {
+            return side * side;
+        }
+        set
+        {
+            side = System.Math.Sqrt(value);
+        }
+    }
+}
+
+（8）sealed 修饰属性，派生类不能修改属性
+
+（9）接口属性
+接口属性不具有函数体
+public interface Inters
+{
+	string Name
+	{	
+		get;
+		set;
+	}
+}
+
+(10) 自动属性
+当属性访问器中不需要其他访问逻辑时候，就可以使用自动属性，使代码更加简洁
+    public double TotalPurchases { get; set; }
+    public string Name { get; set; }
+    public int CustomerID { get; set; }
