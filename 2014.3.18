@@ -1,0 +1,148 @@
+C#学习之函数总结
+1：函数结构同C++，java类似，
+<修饰符> <返回类型> <函数名字> (参数列表)
+{//函数体
+}
+
+2：参数中的特性--参数数组
+C#中允许函数中指定一个特定的参数，这个参数必须是函数定义中的最后一个参数，毫无疑问这些参数必须是同类型的，这样的参数叫做参数数组
+格式：   <modify> <return type> <functionName>(type1,typ2,...paras typen[] <paraName>)
+如：
+static int sumAdd(paras int[] datas)
+{
+	int sum = 0;	
+	foreach(int x in datas)
+		sum += x;
+	return sum;
+
+}
+
+static void main()
+{
+	sunAdd(1,2,3,4,5);
+}
+
+3: 参数的类型,ref
+C#中有两种类型的参数--传值参数，传引用参数，其中传引用参数在调用的时候需要加上一个关键词 ref，这个和C++还是有区别的
+C#--
+static void Main(string[] args)
+        {
+            Console.WriteLine("I love C&&");
+            int val = 10;
+            Console.WriteLine("val's value is:{0}",val);
+            changeValue(ref val);
+            Console.WriteLine("val's value is:{0}",val);
+        }
+
+        static int changeValue(ref int val)
+        {
+            return val *= 2;
+        }
+
+C++--
+void changeValue(int &val)
+{
+	val *= 2;
+}
+void main()
+{
+	int val = 10;
+	cout<<"val's value is:"<<val<<endl;
+	changeValue(val);
+	cout<<"val's value is:"<<val<<endl;
+}
+
+4: 输出参数 out
+这个是C++中没有的，不过在HLSL中有类似的语法，out是一个关键字，其用法同ref，作用也类似ref，但是跟ref相比，它的不同之处是：在传入时候，可以未赋值.
+static void outChange(int x, out int y)
+{
+     y = 2 * x;
+}
+
+static void Main(string[] args)
+{
+    int x = 100;
+    int y;
+    outChange(x,out y);
+    Console.WriteLine("out y's value is:{0}",y);
+}
+
+
+5: Main函数
+C#中的main函数格式
+static void Main();
+static void Main(string[] args);
+static int Main();
+static int Main(string[] args);
+
+6: 委托特征
+
+委托是C#相对C++的一种新的语法，委托类似于C/C++中的函数指针，但是相比指针，它更安全和强大。
+委托的特点：
+<1> 委托允许作为函数参数进行传递
+<2> 委托可用于定义回调方法
+<3> 委托可以连接在一起，对同一事件调用多个响应方法。
+
+7：委托使用
+namespace ConsoleApplication1
+{
+    class Program
+    {
+        public delegate void delFunc(string str);   // 委托的声明
+
+        public static void testDelOne(string str)   //定义委托对应的函数1
+        {
+            Console.WriteLine("This is delegate one:" + str);
+        }
+
+        public static void testDelTwo(string str)   //定义委托对应的函数2
+        {
+            Console.WriteLine("This is delegate two:" + str);
+        }
+
+        public static void testDelThree(string str)  //定义委托对应的函数3 
+        {
+            Console.WriteLine("This is delegate three:" + str);
+        }
+        static void Main(string[] args)
+        {
+            Console.WriteLine("**************Test delegate use like C function pointer***************");
+            delFunc fp = testDelOne;
+            fp(" in 1.1");
+            delFunc xxpp = new delFunc(testDelThree);
+            xxpp("in 1.3");
+
+            Console.WriteLine("****************************Test delegate +=**************************");
+            fp += testDelTwo;
+            fp(" in 2");
+
+            Console.WriteLine("****************************Test delegate + **************************");
+            delFunc fpp = testDelThree;
+            //delFunc fpAll = fp + fpp;
+            delFunc fpAll = fp + testDelThree;
+            fpAll(" in 3");
+
+            Console.WriteLine("****************************Test delegate -=*************************");
+            fpp -= testDelTwo;
+            fpp("in fpp 2");
+
+            fpAll -= testDelTwo;
+            fpAll("in fpAll2");
+
+            Console.WriteLine("****************************Test delegate -**************************");
+            fpAll = fpAll - testDelOne;
+            fpAll(" in last");
+
+        }
+
+    }
+}
+
+
+8: 委托的实例化
+delegate void del(string str);
+void funcName(string str){//....}
+
+<1> named method :	del fp = funcName;
+<2> anonymous method	del fp = delegate(string str){//...};
+<3> Lamda expression	del fp = (x)->{//.....};
