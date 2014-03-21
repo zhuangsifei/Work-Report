@@ -1,0 +1,145 @@
+C# 学习总结
+关于多态
+（1）定义：
+多态是针对派生类和基类的具有相同签名的方法而言的。基类定义并且实现了声明为 virtual 或者abstract的方法，然后派生类通过关键词
+
+override来重写他们
+
+（2）传递性之 virtual：
+A是基类，B继承A，C继承B，如果A中有声明为virtual的属性或者方法，那么不管B中是否针对该属性，方法声明为override，C都可以
+
+overrideA中的这一virtual属性或者方法
+
+传递性之 interface
+namespace ConsoleApplication6Override
+{
+    interface  Interface1
+    {
+        void func1(int x);
+        void func2(string str);
+    }
+
+    class Class1:Interface1
+    {
+        public void func1(int x)
+        {
+            Console.WriteLine("this is in Class1 inherits Interface1");
+        }
+
+        public void func2(string str)
+        {
+            Console.WriteLine("this is in Class1 inherits Interface1");
+        }
+    }
+
+    //error ,继承成员“ConsoleApplication6Override.Class1.func1(int)”未标记为 virtual、abstract 或 override，无法进行重写
+    //error,继承成员“ConsoleApplication6Override.Class1.func2(string)”未标记为 virtual、abstract 或 override，无法进行重写
+    class Class2:Class1
+    {
+        public override void func1(int x)
+        {
+        }
+        public override void func2(string str)
+        { 
+        }
+    }
+}
+
+（3）总结：
+接口声明的方法不具有传递性，virtual声明的方法具有传递性。能够override的只能是标记为virtual，abstract，override的。
+
+关于抽象
+抽象分为抽象类，抽象方法
+（1）抽象类
+类声明前加一个abstract关键字，表示此类是抽象类，抽象类不能被实例化。示例：public abstract class A{};
+(2) 抽象方法
+仅仅只有abstract class才能够abstract method。
+抽象方法没有函数体，以“;”结束。派生类若想能够实例化，必须实现抽象方法，示例：
+public abstract class A
+{
+    public abstract void DoWork(int i);
+}
+
+（3）抽象方法的传递性
+要在派生类中实现抽象方法，必须用到关键词override，所以抽象方法具有传递性，示例如下：
+namespace ConsoleApplication7Abstract
+{
+    abstract class Class1
+    {
+        public void func1(int x)
+        {
+            Console.WriteLine("this is method in abstract class");
+        }
+        public abstract void func2(string str);
+    }
+
+    class Class2:Class1
+    {
+        public override void func2(string str) //must add override for this method
+        {
+            Console.WriteLine("this is method in derived class");
+        }
+    }
+
+    class Class3 : Class2
+    {
+        public override void func2(string str)
+        {
+            base.func2(str);
+        }
+    }
+}
+
+（4）抽象，多态，接口的比较
+就像private，protected，public中的protected介于private和protected之间，abstract的作用同样介于virtual，interface之间。
+virtual是基类定义了virtual属性，方法，但是派生类完全可以不去override他们。
+interface是定义了属性，方法的接口，派生类必须去完全实现他们
+abstract则是在基类中定义了部分接口，这部分接口派生类必须去实现它。然而abstract class中也可以定义virtual method，一般的非	
+
+virtualmethod。所以abstract的作用能力在virtual 和interface之间，基类有必须要实现的也有可以去选择实现的。
+
+（5）抽象类可以用abstract 重写 virtual方法
+    class Class2
+    {
+        public override void func2(string str)
+        {
+            Console.WriteLine("this is method in derived class");
+        }
+
+        public virtual void funv()
+        { 
+
+        }
+
+        public virtual void funva()
+        {
+            Console.WriteLine("this is virtual method in abstract class");
+        }
+    }
+
+    abstract class Class3 : Class2
+    {
+        public override void func2(string str)
+        {
+            base.func2(str);
+        }
+
+        public  abstract override void funva();	//use abstract to override virtual method
+    }
+
+上面将virtual声明为abstract，则对于从抽象类来说继承的方法依然是virtual method
+
+关于静态
+静态包括静态类，静态成员
+（1）静态类的特点：
+仅包含静态成员
+无法实例化
+是sealed的
+不能包含Instance Constructors（就是用new表达式创建类对象时候调用的构造函数）
+（2）静态构造函数
+静态构造函数用于初始化任何静态数据，在创建第一个实例或者任何静态成员调用之前将自动的调用静态构造函数。
+特点:
+<1>静态构造函数没有访问修饰符，没有参数。因为是自动调用的，不可能有参数的。
+<2>自动调用，不能主动调用
+<3>在程序运行中，用户无法控制何时调用静态构造函数。
+<4>静态构造函数引发异常，将不会再次调用此构造函数，在程序运行所在的应用程序域的生存期内，类型将保持未初始化。
