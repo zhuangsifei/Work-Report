@@ -1,0 +1,181 @@
+C# 学习总结
+
+（1）构造函数
+<1>除非是static，否则编译器将会给每一个没有构造函数的类指定一个默认的构造函数
+<2>构造函数private时候，类不能被实例化
+<3>派生类可以通过base来显式的调用基类的构造函数，当无显式调用时，编译器会自动的调用基类的默认构造函数
+<4>基类没有默认构造函数，派生类必须显式的调用base
+<5>构造函数可以标记为 public，protected，private，internal，protected internal
+<6>实例构造函数，静态构造函数。初始化静态类或者非静态类中的静态变量就必须定义静态构造函数。
+<7>私有构造函数
+私有构造函数存在的意义是为了防止被实例化，当一个类不想被声称为静态类，同时里面都是静态成员时候，可以使用静态构造函数。示例：
+public class Counter
+{
+    private Counter() { }
+    public static int currentCount;
+    public static int IncrementCount()
+    {
+        return ++currentCount;
+    }
+}
+
+class TestCounter
+{
+    static void Main()
+    {
+        
+        Counter.currentCount = 100;
+        Counter.IncrementCount();
+        Console.WriteLine("New count: {0}", Counter.currentCount);
+
+        // Keep the console window open in debug mode.
+        Console.WriteLine("Press any key to exit.");
+        Console.ReadKey();
+    }
+}
+
+<8>C#不提供复制构造函数，如果需要得自己编写。
+<9>静态构造函数。
+静态构造函数自动调用，发生在创建第一个实例或者引用任何静态成员之前。
+
+（2）析构函数
+<1>析构函数不能被继承，样式跟C++一样
+class Car
+{
+    ~Car()  // destructor
+    {
+        // cleanup statements...
+    }
+}
+
+<2>析构函数时自动被调用，是通过垃圾回收机制
+程序员无法控制何时调用析构函数，因为这是由垃圾回收器决定的。 垃圾回收器检查是否存在应用程序不再使用的对象。 如果垃圾回收器认为某个对象符合析构，则调用析构函数（如果有）并回收用来存储此对象的内存。 程序退出时也会调用析构函数。
+
+<3>析构函数的隐式转换
+protected override void Finalize()
+{
+    try
+    {
+        // Cleanup statements...
+    }
+    finally
+    {
+        base.Finalize();
+    }
+}
+
+(3) 匿名类
+<1>匿名类型提供了一种方便的方法，可用来将一组只读属性封装到单个对象中，而无需首先显式定义一个类型。 类型名由编译器生成，并且不能在源代码级使用。 每个属性的类型由编译器推断。
+示例：
+public Curry
+{
+	public string Age;
+	public string Name;
+	public string Sex;
+}
+
+//初始化对象
+Curry curry = new Curry
+{
+Age = "18",
+Name = "Andeson",
+Sex = "femal"
+};
+//or 用匿名类
+var curry = new
+{
+Age = "18",
+Name = "Andeson",
+Sex = "femal"
+};
+
+可以看到new后面没有跟类类型，这样我们就定义了一个匿名类，我们不需要知道这个类的名字，我们只能读这个属性，不能改写属性值
+var Cur = new
+{
+     m = 100,
+     n = "sdsdfr"
+};
+// Cur.m = 1000;//error ,不能赋值，因为它是只读的。
+
+<2>匿名类是直接从Object派生的类
+匿名类型与其他引用类型没什么区别，唯一的区别就是匿名类型只能强制转换为Object类型的
+<3>如果两个或更多个匿名类型在同一程序集中具有相同数量和属性类型，在相同的顺序中，则编译器会将这些匿名类型视为同一的类型。 它们共享同一编译器生成的类型信息
+
+(4)分部类
+partial：有时候一个类很大，为了分工明确，我们需要把它放在不同的文件中或者在不同的地方定义，这个时候就用到了分部类。示例：
+public partial class Employee
+{
+    public void DoWork()
+    {
+    }
+}
+
+public partial class Employee
+{
+    public void GoToLunch()
+    {
+    }
+}
+<1>
+partial 关键字指示可在命名空间中定义该类、结构或接口的其他部分。 所有部分都必须使用 partial 关键字。 在编译时，各个部分都必须可用来形成最终的类型。 各个部分必须具有相同的可访问性，如 public、private 等。
+<2>
+如果将任意部分声明为抽象的，则整个类型都被视为抽象的。 如果将任意部分声明为密封的，则整个类型都被视为密封的。 如果任意部分声明基类型，则整个类型都将继承该类。
+<3>
+指定基类的所有部分必须一致，但忽略基类的部分仍继承该基类型。 各个部分可以指定不同的基接口，最终类型将实现所有分部声明所列出的全部接口。 在某一分部定义中声明的任何类、结构或接口成员可供所有其他部分使用。 最终类型是所有部分在编译时的组合。
+partial class Earth : Planet, IRotate { }
+partial class Earth : IRevolve { }
+
+//等同于下面：
+class Earth : Planet, IRotate, IRevolve { }
+
+(5)嵌套类
+嵌套类顾名思义就是类或者结构中定义的类
+class Container
+{
+    class Nested
+    {
+        Nested() { }
+    }
+}
+<1>嵌套类的默认访问权限是private ，可以指定为public，protected，private，internal，protected internal。
+<2>嵌套类型可以访问外部类（包裹嵌套类的类），如果要访问外部类型，要把外部类通过构造函数传进一个实例
+<3>嵌套类中只能访问外部类中的静态成员，不能直接访问外部类的非静态成员。
+namespace ConsoleApplication11Anonymous
+{
+    class Class1
+    {
+        private int x;
+        protected string str;
+        static int y;
+
+        public class Nested
+        {
+            int xx;
+            string ss;
+            void print()
+            {
+                //int y = x;  //error,不能访问外部的非静态成员
+                int z = y;    //OK ,可以访问外部的静态成员
+            }
+
+            public Nested(Class1 A)
+            {
+                xx = A.x;   //通过外部类的实例来访问外部类私有成员
+                ss = A.str; //通过外部类的实例来访问外部类保护成员
+            }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+           
+            Class1 X = new Class1();
+            Class1.Nested CN = new Class1.Nested( X );
+            
+
+        }
+
+    }
+}
