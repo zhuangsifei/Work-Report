@@ -1,0 +1,178 @@
+关于类的成员
+类的成员包括 fields，constraints，properties，methods，events，operators，indexers，constructors，destructors，Nested Types
+（字段，常量，属性，方法，事件，操作符，索引器，构造函数，析构函数，嵌入类型）。
+
+<1>常量
+需要说的是const（常量），const本质上是static的，C#中只有内置类型（System.Object除外）可以声明为const常量，C#不支持const的属性，方法，事件
+C#中的内置类型有：
+bool,byte,sbyte,char,decimal,double,float,int ,uint,long,ulong,short,ushort,string,Object,共计15种。
+
+<2>方法
+这个之前详细介绍过，在这里只需要再明确一个概念--方法的签名
+通过指定方法的访问级别，可选修饰符，返回类型，方法名字，所有参数。这些合起来就是方法的签名（signature）。
+
+对方法进行overloading（重载），方法的返回类型不是方法签名的一部分，但是，在确定委托和委托所指向方法之间的兼容性时，返回类型是方法签名的一部分。
+
+分清楚override（覆盖），overLoading（重载）
+当override时候，要求访问修饰符，返回类型，函数名字，参数类型完全相同；
+当overLoading时候，不要求返回类型相同。
+
+<3>索引器
+索引器类似属性，不过是针对数组的，索引器的使用示例如下所示：
+namespace ConsoleApplication9Indexer
+{
+    class Class1
+    {
+        private string[] Strs = new string[100];
+
+        public string this[int i]
+        {
+            get { return Strs[i]; }
+            set { Strs[i] = value; }
+        }
+
+        private int[,] Ints = new int[10,10];
+
+        public int this[int i,int j]
+        {
+            get { return Ints[i,j]; }
+            set { Ints[i,j] = value; }
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Class1 Tc = new Class1();
+            Tc[1] = "sjkf";
+            Console.WriteLine(Tc[1]);
+            Tc[0,0] = 10;
+            Console.WriteLine(Tc[0,0]);
+        }
+    }
+}
+
+特点：
+<1>用this关键字定义索引器
+<2>用get，set进行访问
+<3>索引器的访问索引可以依据自定的规则，而不是必须是整数
+<4>索引器可以被重载
+<5>索引器可以有多个形参
+
+推理：
+<1>参数类型相同的索引器在类中只能存在一个
+<2>若有多个不同索引器，必须索引器的参数不同
+
+
+接口中的索引器
+接口索引器不能使用访问修饰符，不能有函数体；
+当类继承多个接口索引器并且索引器的参数相同的时候，需要显式的实现接口的索引器，最终索引器的使用也是只能通过接口来调用，不能通过类的对象来直接调用，示例如下：
+namespace ConsoleApplication9Indexer
+{
+    public interface Inter1
+    {
+        string this[int i]
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface Inter2
+    {
+        string this[int j]
+        {
+            get;
+            set;
+        }
+    }
+
+    public interface Inter3
+    {
+        string this[int i]
+        {
+            get;
+            set;
+        }
+    }
+    class Class2 : Inter1,Inter2,Inter3
+    {
+        private string[] names = new string[100];
+        private string[] sexs = new string[100];
+        private string[] Adds = new string[100];
+
+        string Inter1.this[int i]
+        {
+            get { return names[i]; }
+            set { names[i] = value; }
+        }
+
+        string Inter2.this[int j]
+        {
+            get { return sexs[j]; }
+            set { sexs[j] = value; }
+        }
+
+        public string this[int i]
+        {
+            get { return Adds[i]; }
+            set { Adds[i] = value; }
+        }
+    }
+
+	static void Main(string[] args)
+        {
+            Class2 Ts = new Class2();
+            Inter1 Inters1 = (Inter1)Ts;
+            Inters1[11] = "whjhd";
+            Console.WriteLine(Inters1[11]);
+            Inter2 Inters2 = (Inter2)Ts;
+            Inters2[67] = "what a fucking day";
+            Console.WriteLine(Inters2[67]);
+	}
+}
+
+
+关于接口
+<1>接口的内容：方法，属性，索引器，事件。
+<2>接口成员自动是public，abstract，不能添加任何修饰符
+<3>接口的本质上是为了继承，当隐式的实现了接口的方法，就不能再被重写了。
+<4>显式的接口不能用public，abstract去修饰，显式接口永远不能被重写。
+<5>显式接口调用的时候只能通过接口自己去调用。示例：
+namespace ConsoleApplication10Inter
+{
+    interface Interd1
+    {
+        void draw();
+    }
+
+    interface Interd2
+    {
+        void draw();
+    }
+    class Class2 : Interd1,Interd2
+    {
+        void Interd1.draw()
+        {
+            Console.WriteLine("draw in interface1");
+        }
+
+        void Interd2.draw()
+        {
+            Console.WriteLine("draw in interface2");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Class2 T = new Class2();
+            Interd1 d1 = (Interd1)T;
+            d1.draw();
+            Interd2 d2 = (Interd2)T;
+            d2.draw();
+        }
+    }
+}
