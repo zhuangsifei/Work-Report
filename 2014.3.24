@@ -1,0 +1,331 @@
+关于枚举
+
+枚举的意义：
+通过有限离散的整形来限定取值访问，防止无意义数据的垂涎。
+
+枚举的格式：
+enum Name:Type{name1,name2,...}
+其中Type默认是int类型，可以的类型是：byte、sbyte、short、ushort、int、uint、long 或 ulong。
+
+实例：
+enum Days : byte {Sat=1, Sun, Mon, Tue, Wed, Thu, Fri};
+
+特点：
+<1> 可以给枚举类型变量赋以其基类型范围的任何值，不单单局限于已经命名的常量。（通常只用于标志位）
+<2> 默认枚举中元素从0开始，依次加1
+<3> 可以不使用枚举的自动赋值，自己去重写这个赋值过程
+<4> 可以使用枚举中一个值为另一个值赋值，也可以使用整数去赋值
+<5> 枚举中允许出现相同的值,但是我感觉这样没有意义。
+class Program
+    {
+        static void Main(string[] args)
+        {
+            Ex dd = Ex.cat;
+            Console.WriteLine(dd == Ex.mouse); // output true
+            Console.WriteLine( Ex.bird == Ex.chichen); //output true
+        }
+
+        enum Ex:byte
+        {
+            dog,
+            cat,
+            mouse = cat,	//用已有值为新的值赋值
+            fox = 1,		//用常数赋值
+            bird = 2,
+            chichen = 2		//包含相同的常数
+
+        }
+    }
+<6> 枚举用于标志位
+ enum Ef : long
+        {
+            one = 0x00,
+            two = 0x01,
+            three = 0x10
+        }
+static void Main()
+{
+            Ef ff = Ef.three | Ef.two;
+            Console.WriteLine((int)ff); //output 17
+}
+
+<7>枚举值的操作
+            foreach (byte i in Enum.GetValues(typeof(Ex)))
+                Console.WriteLine(i);
+
+            foreach (string str in Enum.GetNames(typeof(Ef)))
+                Console.WriteLine(str);
+结果：
+0
+1
+1
+1
+2
+2
+one
+two
+three
+
+
+关于事件
+public delegate void EventHandler(object sender, EventArgs e);//委托声明
+public event EventHandler AutoSizeChanged;
+
+要了解事件的机制，首先要明白委托的机制。事件机制主要分为事件的声明，事件的触发，事件的响应。事件的触发者成为“发布者”，事件
+
+的响应者成为事件的“订阅者”
+
+事件特征：
+发行者确定何时引发事件，订户确定执行何种操作来响应该事件。
+一个事件可以有多个订户。 一个订户可处理来自多个发行者的多个事件。
+没有订户的事件永远也不会引发。
+事件通常用于通知用户操作，例如，图形用户界面中的按钮单击或菜单选择操作。
+如果一个事件有多个订户，当引发该事件时，会同步调用多个事件处理程序。 要异步调用事件，请参见使用异步方式调用同步方法。
+在 .NET Framework 类库中，事件是基于 EventHandler 委托和 EventArgs 基类的。
+
+事件的发布和订阅:
+事件的发布类中一般包括事件的声明，事件的激发（其实也就是响应，但是响应函数中一定要用到委托）。事件的订阅者要用事件发布类的变
+
+量（用来指定委托对应的函数），事件响应函数。示例：
+class Publish
+    {
+        public event EventHandler eventName; //declare event named eventName
+
+        public void inspireEvent()           // inspire the event
+        {
+            onEventName(new EventArgs());
+        }
+
+        public void onEventName(EventArgs e) // will use the scriber's method to reply the event
+        {
+            EventHandler handle = eventName;
+            if (handle != null)
+            {
+                handle(this,e);
+            }
+        }
+    }
+class Scriber
+    {
+        public Scriber(Publish pb)
+        {
+            pb.eventName += howDo; // scribe the event
+        }
+
+        public void howDo(Object sender, EventArgs e)
+        {
+            Console.WriteLine("what a fuck day it is");
+        }
+    }
+class Program
+    {
+        static void Main(string[] args)
+        {
+            Publish ph = new Publish();
+            Scriber sb = new Scriber(ph);
+
+            ph.inspireEvent();		//motivate the event
+        }
+    }
+
+
+事件的独特性：
+事件是委托，但是它是特殊的委托，调用事件只能在声明事件的类中，在事件的派生类中不能出现诸如：
+EventHandler handle = eventBase；
+eventBase(obj,e);
+只能出现 eventBase+=，eventBase-=。
+所以如果要调用基类中的事件只能通过间接的方式，示例如下：
+ class BaseEvent
+    {
+        public event EventHandler baseEvent;
+
+        public virtual void draw()
+        {
+            Console.WriteLine("This is in base draw");
+        }
+
+        public virtual void onDraw(EventArgs e)
+        {
+            EventHandler handle = baseEvent;
+            if (handle != null)
+            {
+                handle(this ,e);
+            }
+            Console.WriteLine("this is in base on");
+        }
+    }
+
+class Derived : BaseEvent
+    {
+        public override void draw()
+        {
+            //base.draw();
+            Console.WriteLine("this is in derived class");
+        }
+
+        public override void onDraw(EventArgs e)
+        {
+            //EventHandler handle = baseEvent;
+            //baseEvent(this, e);
+
+            base.onDraw(e);
+            
+        }
+
+        public void motivateDraw()
+        {
+            onDraw(new EventArgs());
+        }
+    }
+class Scribe
+    {
+        public Scribe(Derived dr)
+        {
+            dr.baseEvent += Motive;
+        }
+
+        public void Motive(Object sender, EventArgs e)
+        {
+            Console.WriteLine("what a fuck day");
+        }
+    }
+
+class Program
+    {
+        static void Main(string[] args)
+        {
+            Derived D = new Derived();
+            BaseEvent B = new BaseEvent();
+            Scribe Sb = new Scribe(D);
+            D.motivateDraw();
+        }
+    }
+
+
+接口事件的实现
+接口事件的实现和接口中方法，属性的实现基本相同。当订阅事件的时候，订阅的方法通过事件访问器添加到委托的方法列表中，事件访问器
+
+类似于属性访问器，不过访问器被命名为add，remove。在大多数情况下都不需要自定义事件访问器，因为编译器会帮我们制定，但是当编译器
+
+不能帮我们制定的时候，我们就得自己去写事件访问器了。
+
+当多个接口中含有具有相同签名的事件的时候，这个时候就得使用事件的显示定义了，并且在事件的订阅的时候使用接口来调用(这里很类似属
+
+性，索引器，方法)，示例如下：
+namespace ConsoleApplication16InterfaceEvent
+{
+    interface Iface
+    {
+        event EventHandler faceEvent;
+    }
+
+    interface Ifoot
+    {
+        event EventHandler footEvent;
+    }
+
+    interface Ihand
+    {
+        event EventHandler footEvent;
+    }
+    class InterEvent : Iface,Ifoot,Ihand
+    {
+        public event EventHandler faceEvent;
+        //public event EventHandler footEvent;
+        public event EventHandler preFootEvent;
+        public event EventHandler nexHandEvent;
+
+        Object objectLock = new Object();
+
+        event EventHandler Ifoot.footEvent
+        {
+            add 
+            {
+                lock (objectLock)
+                {
+                    preFootEvent += value;
+                }
+            }
+            remove
+            {
+                lock (objectLock)
+                {
+                    preFootEvent -= value;
+                }
+            }
+        }
+
+        event EventHandler Ihand.footEvent
+        {
+            add 
+            {
+                lock (objectLock)
+                {
+                    nexHandEvent += value;
+                }
+            }
+
+            remove
+            {
+                lock (objectLock)
+                {
+                    nexHandEvent -= value;
+                }
+            }
+        }
+
+        public void finger()
+        {
+            EventHandler handle = preFootEvent;
+            if ( handle != null)
+                preFootEvent(this,new EventArgs());
+
+            handle = nexHandEvent;
+            if (handle != null)
+                nexHandEvent(this,new EventArgs());
+        }
+    }
+
+}
+
+//...............
+namespace ConsoleApplication16InterfaceEvent
+{
+    class Scribe
+    {
+        public Scribe(InterEvent Et)
+        {
+            Ifoot foot = (Ifoot)Et;
+            foot.footEvent += draw1;
+
+            Ihand hand = (Ihand)Et;
+            hand.footEvent += draw2;
+
+            
+        }
+
+        void draw1(Object sender, EventArgs e)
+        {
+            Console.WriteLine("this is in Scribe draw1");
+        }
+
+        void draw2(Object sender, EventArgs e)
+        {
+            Console.WriteLine("this is in Scribe draw2");
+        }
+    }
+}
+//..................
+namespace ConsoleApplication16InterfaceEvent
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            InterEvent EI = new InterEvent();
+            Scribe Sb = new Scribe(EI);
+            EI.finger();
+        }
+    }
+}
+
