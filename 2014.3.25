@@ -1,0 +1,222 @@
+关于集合
+集合主要用于数据存储和检索，.net中的集合提供了支持堆栈，队列，链表，哈希表，大多数集合实现相同的接口，可以继承这些接口来创建更为专业的新集合类。
+
+泛型集合，非泛型集合对比：
+.net中的定义集合分为泛型，非泛型。非泛型的在空间System.Collections，泛型的在System.Collections.Generic中。
+非泛型集合类的类型是System.Object类，因此它的类型比较弱，而泛型集合可以提供更高的类型安全性，因此具有更好的性能。
+非泛型集合如果想提供强类型实现，要从基集合类型派生并且实现特定的成员，这比较麻烦。
+
+集合接口：
+集合类大多都派生于ICollection、IComparer、IEnumerable、IList、IDictionary 和 IDictionaryEnumerator 。
+
+常见的集合类型：
+<1>Array
+public abstract class Array : ICloneable,IList, ICollection, IEnumerable, IStructuralComparable, IStructuralEquatable
+Array是一个抽象类，里面提供了很多静态方法，只有system，编译器能够显式的继承它，Array类是支持数组的语言实现的基类，也就是说C#中的数组是从Array类继承的。数组是从Array类继承的引用类型。
+我们知道对一个数组来说，其常用的操作有“创建初始化”，"复制"，“查找”，“索引”，“设置值”，“排序”。下面一一举出常用函数。
+创建：
+CreateInstance(Type, Int32)	//创建一个指定长度的一维数组
+CreateInstance(Type, Int32[])	//创建一个多维数组，多维数组的长度在Int32[]中指定
+CreateInstance(Type, Int64[])	//创建一个多维数组，多维数组的长度在Int64[]中指定	
+CreateInstance(Type, Int32, Int32)		//创建一个具有指定维长的2维数组
+CreateInstance(Type, Int32[], Int32[])		//创建具有指定下限，指定长度的多维数组
+CreateInstance(Type, Int32, Int32, Int32)	//创建一个3维数组
+
+复制：
+Copy(Array A, Array B, Int32 n)	//把A中从第一个元素开始的n个元素复制到B中
+Copy(Array, Array, Int64)
+Copy(Array A, Int32 start, Array B, Int32 start, Int32)	//把A中从start开始的n个元素复制到B中从start开始的元素
+Copy(Array, Int64, Array, Int64, Int64)
+CopyTo(Array B, Int32 start)	//把对象中所有的元素复制到B中从start开始的元素
+CopyTo(Array, Int64)
+
+查找：
+public static T Find<T>( T[] array, Predicate<T> match) //查找满足match条件的元素并返回第一个符合条件的元素
+示例如下：
+public class Example
+{
+    public static void Main()
+    {
+        Point[] points = { new Point(100, 200), new Point(150, 250), new Point(250, 375), 
+            new Point(275, 395), new Point(295, 450) };
+
+        Point first = Array.Find(points, ProductGT10);
+
+        // Display the first structure found.
+        Console.WriteLine("Found: X = {0}, Y = {1}", first.X, first.Y);
+    }
+
+    // This method implements the test condition for the Find method.
+    private static bool ProductGT10(Point p)
+    {
+        if (p.X * p.Y > 100000)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}
+
+//	output:
+
+//	Found: X = 275, Y = 395
+
+
+FindAll<T>	//返回符合查询条件的所有元素的数组
+FindIndex<T>(T[] A, Predicate<T> e)	//从数组A中找到符合条件e的首个元素的索引并返回
+FindIndex<T>(T[] A, Int32 s, Predicate<T> e)	//从数组A中索引s开始找到符合条件e的元素并返回
+FindIndex<T>(T[] A, Int32 s, Int32 l, Predicate<T> e)	//从数组A中以索引s开始，长度为l，找到符合条件e的首个元素索引并返回
+FindLastIndex<T>(T[], Predicate<T>)
+FindLastIndex<T>(T[], Int32, Predicate<T>)
+FindLastIndex<T>(T[], Int32, Int32, Predicate<T>)
+
+获取数组相关属性
+GetLength	//获取数组长度
+public int GetLowerBound(int dimension)	//获取指定维度的数组的下限
+public int GetUpperBound(int dimension)	//获取指定维度的数组的上限
+public Type GetType()			//获取当前实例的Type
+
+根据索引求对象
+public Object GetValue(int index)	//获取一维数组中指定索引的元素值
+public Object GetValue(params int[] indices)//获取多维数组中指定索引的元素值
+public Object GetValue(	int index1,int index2)
+public Object GetValue(int index1,int index2,int index3)
+
+根据对象求索引
+IndexOf(Array, Object)
+IndexOf(Array, Object, Int32)
+IndexOf(Array, Object, Int32, Int32)
+LastIndexOf(Array, Object)
+LastIndexOf(Array, Object, Int32)
+LastIndexOf(Array, Object, Int32, Int32)
+
+设置对象的值
+SetValue(Object, Int32)
+SetValue(Object, Int32[])
+SetValue(Object, Int32, Int32)
+SetValue(Object, Int32, Int32, Int32)
+...//当然有针对泛型的比较
+
+排序
+Sort(Array)		// 对整个一维数组进行快速排序
+Sort(Array, IComparer)	// 对整个一维数组按照IComparer中实现的方法进行排序
+Sort(Array, Int32, Int32)//对一维数组中指定范围的元素进行排序
+Sort(Array, Int32, Int32, IComparer)
+
+Sort(Array A, Array B)		//A,B是两个数组，之间的关系类似map中的key值，iterm值
+Sort(Array, Array, IComparer)
+Sort(Array, Array, Int32, Int32)
+Sort(Array, Array, Int32, Int32, IComparer)
+...//当然有对应的泛型的排序
+
+ArrayList 和List<T>
+public class ArrayList : IList, ICollection, IEnumerable, ICloneable
+public class List<T> : IList<T>, ICollection<T>, IEnumerable<T>, IList, ICollection, IEnumerable
+其中的IList接口说明了两者都可以通过索引来访问元素的值。
+以List<T>说明主要函数
+构造函数：
+List<T>();
+List<T>( IEnumrable<T> );	 //从指定的集合中复制元素
+List<T>(Int32);
+
+添加元素：
+public void Add(T item)				//末尾添加元素
+public void AddRange(IEnumerable<T> collection) //末尾添加一定数量的元素
+public void Insert(int index,T item)		//插入元素
+public void InsertRange(
+	int index,IEnumerable<T> collection)
+
+删除元素：
+public bool Remove(T item)			//从List中移除第一项匹配的
+public int RemoveAll(Predicate<T> match)	//从List中移除所有满足条件的
+public void RemoveAt(int index)			//移除指定索引的项
+public void RemoveRange(int index,int count)	//从List中移除一定范围的项
+
+查找元素：
+查找满足条件的对象，查找给定索引的对象，查找给定对象的索引
+public T Find(Predicate<T> match)
+public List<T> FindAll(Predicate<T> match)
+public int FindIndex(Predicate<T> match)
+public int FindIndex(int startIndex,Predicate<T> match)
+public int FindIndex(int startIndex,int count,Predicate<T> match)
+public T FindLast(Predicate<T> match)
+public int FindLastIndex(Predicate<T> match)
+public int FindLastIndex(int startIndex,Predicate<T> match)
+public int FindLastIndex(int startIndex,int count,Predicate<T> match)
+
+public int IndexOf(T item)
+public int IndexOf(T item,int index)
+public int IndexOf(T item,int index,int count)
+
+Arr[];//通过这个东西来索取元素值
+
+排序：
+public void Sort()
+public void Sort(Comparison<T> comparison)
+public void Sort(IComparer<T> comparer)
+public void Sort(int index,int count,IComparer<T> comparer)
+
+
+Hashtable和Dictionary
+public class Hashtable : IDictionary, ICollection, IEnumerable, ISerializable, IDeserializationCallback, ICloneable
+public class Dictionary<TKey, TValue> : IDictionary<TKey, TValue>, ICollection<KeyValuePair<TKey, TValue>>, 			IEnumerable<KeyValuePair<TKey, TValue>>, IDictionary, ICollection, IEnumerable, ISerializable, IDeserializationCallback
+
+这些东西都是一个key（键值），一个value，通过哈希函数把键值映射为数组的索引值，然后通过数组索引来查找key对应的value。
+所以使用哈希表可以很方便的进行查找和更改元素
+Hashtable Ht = new Hashtable();
+Ht.Add("zhang san","man");
+Ht.Add("zhang sun","man");
+Ht.Add("wang jiuge","female");
+Console.WriteLine(Ht["wang jiuge"]);
+
+Hashtable中常用的函数
+public virtual void Add(Object key,Object value)
+public virtual void Clear()
+public virtual bool Contains(Object key)
+public virtual bool ContainsKey(Object key)
+public virtual bool ContainsValue(Object value)
+public virtual void Remove(Object key)
+
+DIctionary<TKey,TValue>跟Hashtable有类似的操作，并且当添加的key值相同的时候都会出现异常。
+
+HashSet：
+ HashSet<T> 类提供高性能的集运算。 集合是一组不重复出现且无特定顺序的元素，当添加重复的元素的时候不会出现异常。
+
+Stack 和 Stack<T>:
+public class Stack<T> : IEnumerable<T>, ICollection, IEnumerable
+public class Stack : ICollection, IEnumerable, ICloneable
+常用操作：
+public T Pop();
+public void Push(T item)
+public T Peek()；		//返回栈顶元素，但是不将其弹出
+public void Clear()	
+public bool Contains(T item)	//是否包含某元素
+public T[] ToArray()		//将元素复制到新数组
+public void TrimExcess()	//如果元素个数小于当前容量的90%，则将其容量设置为元素个数大小	
+
+Queue 和 Queue<T>:
+public class Queue<T> : IEnumerable<T>, ICollection, IEnumerable
+public class Queue : ICollection, IEnumerable, ICloneable
+常用操作：
+public void Clear()
+public bool Contains(T item)
+public T Dequeue()		//移除并返回队列开头的元素
+public void Enqueue(T item)	//将对象添加到队列末尾
+public T Peek()			//返回位于开头的元素但是不将其删除
+public T[] ToArray()		//将元素复制到新数组
+public void TrimExcess()	//如果元素个数小于当前容量的90%，则将其容量设置为元素个数大小
+
+
+排序集合：
+public class SortedList : IDictionary, ICollection, IEnumerable, ICloneable
+public class SortedList<TKey, TValue> : IDictionary<TKey, TValue>, 
+	ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>, 
+	IDictionary, ICollection, IEnumerable
+public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, 
+	ICollection<KeyValuePair<TKey, TValue>>, IEnumerable<KeyValuePair<TKey, TValue>>, 
+	IDictionary, ICollection, IEnumerable
+特点：
+每个元素是一个键/值对，以进行枚举
