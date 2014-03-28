@@ -1,0 +1,152 @@
+C#总结之 泛型
+（1） 泛型的优点
+泛型的使用主要是在集合中，在集合中非泛型是把类型转化为通用基类型Object，这样做虽然方便但是有两个缺点:
+<1>要进行装箱操作，拆箱操作，因此会降低性能
+<2>缺乏对类型检查，容易出错。
+
+（2)类型参数的约束
+通过限制类型，从而可以限制泛型实例化的类型。
+<1>MyClass<T>where T:constraint.
+<2>约束的种类
+T:struct		//类型必须是值类型
+T:class			//类型必须是引用类型
+T:baseClassName		//类型必须是baseClass或者是baseClass的派生类
+T:interfaceName		//类型参数必须是指定的接口或实现指定的接口。 可以指定多个接口约束。 约束接口也可以是泛型的
+T:new()			//类型必须有一个无参数的public构造函数，多约束存在时，new必须放在最后
+T:U			//类型T必须是类型U的同类型或者是U的派生类
+
+<3>一个类型参数可以有多个约束
+MyClass<T>where T:constraint1，constraint2
+<4>一个泛型类可以使用多个where语句，
+MyClass<T1，T2>where T1:constraint where T2:constraint2
+<5>约束必须出现在继承说明符的后面
+MyClass<T> : BaseClass,Interface where T:constraint
+
+（3）模板类
+<1>泛型类可以从concrete（具体）, closed constructed（封闭构造）, or open constructed（开发构造的类继承
+class BaseNode { }
+class BaseNodeGeneric<T> { }
+
+// concrete type
+class NodeConcrete<T> : BaseNode { }
+
+//closed constructed type
+class NodeClosed<T> : BaseNodeGeneric<int> { }
+
+//open constructed type 
+class NodeOpen<T> : BaseNodeGeneric<T> { }
+
+<2>非泛型类可以只能从closed constructed（封闭构造），concrete类继承
+
+<3>泛型类从open constructed(开放)基类继承的话，必须提供基类所需要的泛型
+class BaseNodeMultiple<T, U> { }
+class Node4<T> : BaseNodeMultiple<T, int> {}	//No error	
+class Node5<T, U> : BaseNodeMultiple<T, U> {}	//No error
+//class Node6<T> : BaseNodeMultiple<T, U> {} 	//Generates an error
+
+<4>开放式方式继承的类的约束 必须是基类约束的超集
+class NodeItem<T> where T : System.IComparable<T>, new() { }
+class SpecialNodeItem<T> : NodeItem<T> where T : System.IComparable<T>, new() { }
+
+<5>Open constructed and closed constructed types可以用作函数的参数
+void Swap<T>(List<T> list1, List<T> list2)
+{
+    //code to swap items
+}
+void Swap(List<int> list1, List<int> list2)
+{
+    //code to swap items
+}
+
+（4）泛型方法
+<1>
+函数的参数是类型的时候，方法是泛型方法，格式如下：
+public void func<T t>();
+<2>
+泛型方法的调用：
+func<int>(a);或者func(a);//编译器会自动推断a的类型。
+<3>
+注意细节：
+泛型类中的泛型方法不要使用和泛型类相同的类型标记，这样会出现CS0693的警告。
+class GenericList<T>
+{
+    // CS0693
+    void SampleMethod<T>() { }
+}
+
+class GenericList2<T>
+{
+    //No warning
+    void SampleMethod<U>() { }
+}
+<4>
+泛型方法也可以使用类型约束：
+//下面这个方法现在只能被实现了System.IComparable<T>的参数T使用。
+void SwapIfGreater<T>(ref T lhs, ref T rhs) where T : System.IComparable<T>
+{
+    T temp;
+    if (lhs.CompareTo(rhs) > 0)
+    {
+        temp = lhs;
+        lhs = rhs;
+        rhs = temp;
+    }
+}
+
+<5>泛型类中的非泛型方法可以访问类级别的类型参数
+class SampleClass<T>
+{
+    void Swap(ref T lhs, ref T rhs) { }
+}
+
+(5) 泛型和数组
+在 C# 2.0 以及更高版本中，下限为零的一维数组自动实现 IList<T>。 这使您可以创建能够使用相同代码循环访问数组和其他集合类型的泛型方法。 此技术主要对读取集合中的数据很有用。 IList<T> 接口不能用于在数组中添加或移除元素。 如果尝试对此上下文中的数组调用 IList<T> 方法（例如 RemoveAt），则将引发异常。
+ class Program
+    {
+        static void Main(string[] args)
+        {
+            int[] arr = new int[] { 1,2,35,4,78};
+            process<int>(arr);
+        }
+
+        private static void process<T>(IList<T> cell)
+        {
+            foreach (T i in cell)
+            {
+                Console.WriteLine("This is "+i);
+            }
+        }
+    }
+
+（6）泛型委托
+<1> 泛型委托的定义
+public delegate void Del<T>(T item);
+public static void Notify(int i) { }
+
+Del<int> m1 = new Del<int>(Notify);
+
+// this is ok too
+Del<int> m2 = Notify;
+
+<2> 泛型内部定义的委托中用的泛型类型可以是类中的
+class Stack<T>
+{
+    T[] items;
+    int index;
+
+    public delegate void StackDelegate(T[] items);
+}
+
+<3> 定义委托变量必须加上泛型类型
+private static void DoWork(float[] items) { }
+
+public static void TestStack()
+{
+    Stack<float> s = new Stack<float>();
+    Stack<float>.StackDelegate d = DoWork;//委托可以通过类名来调用
+}
+
+(7)泛型中的默认关键字
+对泛型赋一个默认值的时候，要注意泛型是值类型还是引用类型，如果是值类型还要分清楚是数值还是结构，所以这是一个要注意的问题，C#针对这个问题的解决采用了关键字default来处理，
+这对泛型变量 T t = default（T）；
+这样就给泛型T的变量t赋了默认值。
