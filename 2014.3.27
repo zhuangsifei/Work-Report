@@ -1,0 +1,171 @@
+C# 学习总结：
+
+关于命名空间的细节：
+<1>namespace的层次结构优先于namespace的别名
+如果出现这种别名和已有的namespace重名的情况，要想试用别名可以使用"::"这样就限制了调用的是别名命名空间。
+using MyNamespace = ConsoleApplication19Namespace.MyNamespace2;
+namespace ConsoleApplication19Namespace
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            MyNamespace.Myclass My = new MyNamespace.Myclass();
+            My.print();
+            MyNamespace::Myclass You = new MyNamespace::Myclass();
+            You.print();
+        }
+    }
+
+    namespace MyNamespace
+    {
+        class Myclass
+        {
+            public void print()
+            {
+                Console.WriteLine("This is in the ConsoleApplication.MyNamespace.Myclass");
+            }
+        }
+    }
+
+    namespace MyNamespace2
+    {
+        class Myclass
+        {
+            public void print()
+            {
+                Console.WriteLine("This is in the ConsoleApplication.MyNamespace2.Myclass");
+            }
+        }
+    }
+}
+output:
+This is in the ConsoleApplication.MyNamespace.Myclass
+This is in the ConsoleApplication.MyNamespace2.Myclass
+
+<2>全局命名空间
+global和“::”一起使用 globale::表示的顶级根namespace的别名，通过顶级根namespace的调用可以防止外部变量或者外部类被内
+
+部变量，内部类隐藏的出现。
+例如：
+global::System.Console.WriteLine("what a fuck day");//这样就不会出现问题。
+
+（2）关于字符串string的细节
+string类是C#的内置类型，它是只读的，不能被改写。
+string str1 = "dsads";
+str1 = "dsf";//这个时候其实str1的内存地址已经更新的，之前的那个被垃圾回收了。
+
+我们可以使用stringBuilder来创建字符串，类创建了一个字符串缓冲区，用于在程序执行大量字符串操作时提供更好的性能。 
+
+StringBuilder 字符串还使您能够重新分配个别字符（内置字符串数据类型所不支持的字符）。例如：
+
+System.Text.StringBuilder sb = new System.Text.StringBuilder();
+for (int i = 0; i < 10; i++)
+{
+    sb.Append(i.ToString());
+}
+System.Console.WriteLine(sb);  
+sb[0] = sb[9];
+
+
+（3）可以为null的类型
+可以为null的类型是System.Nullable<T>结构的实例， 可以为 null 的类型可以表示其基础值类型正常范围内的值，再加上一个 
+
+null 值。Nullable<Int32> 读作“可以为 null 的 Int32”，可以将其赋值为 -2147483648 到 2147483647 之间的任意值，也可以
+
+将其赋值为 null 值。 可以赋给 Nullable<bool> 的值包括 true、false 或 null。 
+
+这样的意义：
+在处理数据库会有很多没有被赋值的东西，我们可以让他们为null值。
+
+规则：
+ T? 是 Nullable<T> 的简写，此处的 T 为值类型。 这两种形式可以互换。如：
+int? x = null == Nullable<int> x = null.
+
+??运算符
+ op1？？op2 表示的意思是： op1 == null ？op2 :op1
+
+(4)类型转换
+<1> C#中bool 类型不能转换为int类型
+<2> C#中的内置类型
+bool byte sbyte short ushort int uint long ulong char float double  demical string Object
+
+<3>值类型
+C#中值类型分别结构和enum，其中的内置数据类型是结构类型，它具有自己可以访问的属性和方法。
+
+关于文件的操作
+主要有几个个类。
+(1)
+DriveInfo 比较简单，这个主要是几个属性，驱动就是电脑中盘，C盘，D盘等
+DriveInfo di = new DriveInfo("G:\\");
+
+            Console.WriteLine(di.AvailableFreeSpace);   //可用空间
+            Console.WriteLine(di.DriveFormat);          //文件格式
+            Console.WriteLine(di.DriveType);            //驱动格式
+            Console.WriteLine(di.Name);                 //驱动名字
+            Console.WriteLine(di.RootDirectory);        //驱动根目录
+            Console.WriteLine(di.TotalFreeSpace);       //总的可用空间
+            Console.WriteLine(di.TotalSize);            //总的空间
+            Console.WriteLine(di.VolumeLabel);          //卷标
+
+            DriveInfo[] dis = DriveInfo.GetDrives();    //获取所有的驱动
+            foreach (DriveInfo sdi in dis)
+            {
+                Console.WriteLine(sdi.Name);
+                //Console.WriteLine(sdi.RootDirectory);
+            }
+
+(2)
+DirectoryInfo文件夹，或者目录。  
+
+DirectoryInfo的属性：          
+	    DirectoryInfo diSource = new DirectoryInfo(sourceDirectory);
+            Console.WriteLine(diSource.Attributes);
+            Console.WriteLine(diSource.CreationTime);
+            Console.WriteLine(diSource.CreationTimeUtc);
+            Console.WriteLine(diSource.Exists);
+            Console.WriteLine(diSource.Extension.ToString());
+            Console.WriteLine(diSource.FullName);
+            Console.WriteLine(diSource.LastAccessTime);
+            Console.WriteLine(diSource.LastAccessTimeUtc);
+            Console.WriteLine(diSource.LastWriteTime);
+            Console.WriteLine(diSource.LastWriteTimeUtc);
+            Console.WriteLine(diSource.Name);
+            Console.WriteLine(diSource.Parent.ToString());
+            Console.WriteLine(diSource.Root);
+
+关于Directory的一些常见的主要的方法
+void Create()					//创建目录
+DirectoryInfo CreateSubdirectory(string path)	//创建子目录
+void Delete()					//如果目录为空则删除,非空删除时会出现异常
+void Delete(bool recursive)			//true则删除整个目录以及所有子目录，文件，false则同无参数的Delete
+DirectoryInfo[] GetDirectories()
+DirectoryInfo[] GetDirectories(string searchPattern)
+GetDirectories(String, SearchOption)
+FileInfo[] GetFiles()
+FileInfo[] GetFiles(string searchPattern)
+FileInfo[] GetFiles(string searchPattern,SearchOption searchOption)
+GetFileSystemInfos()			//返回表示某个目录中所有文件和子目录的强类型 FileSystemInfo 项的数组。
+void MoveTo(string destDirName)
+
+(3)
+关于FileInfo类
+FileInfo的属性跟DirectoryInfo相差无几，主要说说FileInfo的方法
+StreamWriter AppendText()	//以追加文本的方式来创建一个StreamWriter
+FileInfoCopyTo(String)		//复制文本
+FileInfo CopyTo(string destFileName,bool overwrite)//复制文本
+FileStream Create()		//创建文件流
+StreamWriter CreateText()
+void Delete()			//永久删除文件
+MoveTo(string destFileName)	//移动文件
+FileStream Open(FileMode mode)	//打开方式
+
+FileStream Open(		//打开文件
+	FileMode mode,
+	FileAccess access,
+	FileShare share
+)
+
+FileStream OpenRead()
+StreamReader OpenText()	//创建使用 UTF8 编码、从现有文本文件中进行读取的StreamReader
+FileStream OpenWrite()	//创建只写fileStream
