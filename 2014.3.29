@@ -1,0 +1,130 @@
+关于协变和逆变
+协变和逆变统称为变体，这是用于数组类型，委托类型，泛型参数类型间进行隐式引用转换用的语法规则，有点类似多态。
+
+泛型接口中的变体
+<1>协变
+接口中声明的方法的泛型返回类型，它可以接受派程度更大的返回类型
+
+interface ICovariant<out R>
+{
+    R GetSomething();
+    // The following statement generates a compiler error.
+    // void SetSometing(R sampleArg);
+
+}
+<2>逆变
+接口中声明的方法的泛型参数类型，它可以接受派生程度更小的参数类型
+interface IContravariant<in A>
+{
+    void SetSomething(A sampleArg);
+    void DoSomething<T>() where T : A;
+    // The following statement generates a compiler error.
+    // A GetSomething();            
+}
+
+<3> 协变和抗变的同时实现
+interface IVariant<out R, in A>
+{
+    R GetSomething();
+    void SetSomething(A sampleArg);
+    R GetSetSometings(A sampleArg);
+}
+
+<4>关于变体的一些理解
+变体包括抗变，协变，它是为了处理泛型，委托中基类与派生类赋值问题而出现的，因此类似于多态。
+关于协变我们很容易理解，它是实现派生级别高赋给派生级别低的。在泛型接口中，协变的标示是out，并且它表示的也是函数的返
+
+回值，就根据这一点说明它就很类似。
+关于抗变，接口中标示的是in，并且它表示的是传入的函数参数，所以抗变中表象是派生级别低的赋给派生级别高的，实质上还是把
+
+用派生级别高的来做输入，输入到派生级别低的函数参数中。
+
+关于抗变的例子：
+namespace ConsoleApplication24
+{
+    // Simple hierarchy of classes.
+    public class Person
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+    }
+
+    public class Employee : Person { }
+
+    // The custom comparer for the Person type
+    // with standard implementations of Equals()
+    // and GetHashCode() methods.
+    class PersonComparer : IEqualityComparer<Person>
+    {
+        public bool Equals(Person x, Person y)
+        {
+            if (Object.ReferenceEquals(x, y)) return true;
+            if (Object.ReferenceEquals(x, null) ||
+                Object.ReferenceEquals(y, null))
+                return false;
+            return x.FirstName == y.FirstName && x.LastName == y.LastName;
+        }
+        public int GetHashCode(Person person)
+        {
+            if (Object.ReferenceEquals(person, null)) return 0;
+            int hashFirstName = person.FirstName == null
+                ? 0 : person.FirstName.GetHashCode();
+            int hashLastName = person.LastName.GetHashCode();
+            return hashFirstName ^ hashLastName;
+        }
+    }
+
+    class Program
+    {
+
+        public static void Test()
+        {
+            List<Employee> employees = new List<Employee> {
+               new Employee() {FirstName = "Michael", LastName = "Alexander"},
+               new Employee() {FirstName = "Jeff", LastName = "Price"}
+            };
+
+            // You can pass PersonComparer, 
+            // which implements IEqualityComparer<Person>,
+            // although the method expects IEqualityComparer<Employee>.
+
+            IEnumerable<Employee> noduplicates =
+                employees.Distinct<Employee>(new PersonComparer());
+
+            foreach (var employee in noduplicates)
+                Console.WriteLine(employee.FirstName + " " + employee.LastName);
+        }
+
+        public static void Main()
+        {
+            Test();
+        }
+    }
+
+}
+
+泛型类型参数中的变体
+<1>
+如果要启用隐式转换，必须使用in或者out关键字
+public delegate T SampleGenericDelegate <out T>();
+
+public static void Test()
+{
+    SampleGenericDelegate <String> dString = () => " ";
+
+    // You can assign delegates to each other,
+    // because the type T is declared covariant.
+    SampleGenericDelegate <Object> dObject = dString;           
+}
+<2>
+如果您仅使用变体支持来匹配方法签名和委托类型，且不使用 in 和 out 关键字，则可能会发现，有时可以用相同的 lambda 表达式或方法来实例化多个委托，但无法将一个委托指派给另一个委托。
+public static void Test()
+{
+    SampleGenericDelegate<String> dString = () => " ";
+    SampleGenericDelegate<Object> dObject = () => " ";
+
+    // SampleGenericDelegate <Object> dObject = dString;	//error
+
+
+
+}
