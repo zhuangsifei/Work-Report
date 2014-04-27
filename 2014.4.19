@@ -1,0 +1,197 @@
+ASP.net 入门1
+
+1 ASP.net是.net框架的一部分，.net框架包含两部分，一个是框架类库，一个是CLR(公共语言运行库)
+2 .net中的源代码会被翻译成MSIL（微软中间语言），当程序正式运行时候JITTER（just-in-Time编译器）把MSIL代码实时i编译成机器码
+
+。.net 平台上能够运行的语言有很多种。
+
+3 ASP.NET的空间有90多个，分为 标准控件，验证控件，Rich控件，数据控件，导航控件，登陆控件，HTML控件
+
+4 HTML标签到ASP.net控件的转换，标签上加上 runat='server'属性值。.net中的HTML控件能使HTML页面转换到.net上更容易。
+ 
+5 事件是在服务器端上引发的。例如：当在浏览器上单击一个按钮，单击事件并没有引发，直到包含这个按钮的页面被传回到服务器端，单
+
+击事件才会被引发。
+
+6 视图状态
+HTTP协议是一种无状态协议，每一次对网页发出请求，在网站看来都是完全陌生的。
+ASP.NET通过VIEWSTATE方法突破了HTTP协议的这个限制。默认情况下ASP.NET给每个空间都启用了视图状态，通过视图状态保存了控件的状
+
+态。
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" 
+
+value="/wEPDwUKLTU2ODgwMzc3NQ9kFgICAw9kFgICAw8PFgIeBFRleHQFATFkZGQ0uORG7Fyq5sg0wZeP5iYMPxlyYPsAbYe5HabBmAxZPg==" />
+
+7 通过设置<%@ Page trace="true"%>Page 的trace属性可以跟踪页面信息。
+
+8 动态编译
+
+9 LiteralControl
+LiteralControl控件点缀于其他控件之间，用来表示HTML的内容
+
+10 代码隐藏
+ASP.NET允许创建两种不同风格的ASP.NET页面，单一页面，双文件页面。
+单一页面是把页面代码（消息处理），页面控件写在一起。双文件页面通常称为代码隐藏（code-behind）
+
+11 代码调试
+设置Page的属性 debug = "true"可以进行页面的调试
+在config文件中 设置compilation的属性debug = "true"可以对所有的页面进行调试 <compliation debug="true">
+
+断点的设置，在逻辑代码处设置断点跟C#的断点设置一样。
+
+12 标准控件之Label
+Label支持标签内容可变，Label一个重要的属性是AssociatedControl，通过设置关联的控件，可以使控件之间有相互联系，例如
+<form id="form1" runat="server">
+    <asp:Label ID="lblFirstName" runat="server" AssociatedControlID="txtFirstName" 
+        Text="FirstName"></asp:Label>
+    <div>
+    
+        <asp:TextBox ID="txtFirstName" runat="server"></asp:TextBox>
+        <br />
+        <asp:Label ID="lblLastName" runat="server" AssociatedControlID="txtLastName" 
+            Text="Last Name"></asp:Label>
+        <br />
+        <asp:TextBox ID="txtLastName" runat="server"></asp:TextBox>
+    
+    </div>
+    </form>
+当点击Label的时候，输入焦点会转打牌Label关联的TextBox控件中。
+
+13 标准控件之Literal
+Literal的特殊属性Mode，它接受以下3个属性：
+PassThrough 	显示控件的内容但是不进行任何编码
+Encode		编码HTML内容后再进行控件内容的显示
+Transform	在清除设备不支持的标记后再显示控件的内容
+
+    <asp:Literal ID="Literal1" runat="server" Mode="PassThrough" Text="&lt;hr/&gt;"></asp:Literal>
+    <asp:Literal ID="Literal2" runat="server" Mode="Encode" Text="&lt;hr/&gt;"></asp:Literal>
+    <asp:Literal ID="Literal3" runat="server" Text="&lt;hr/&gt;"></asp:Literal>
+
+14  标准控件之TextBox
+TextBox主要用来进行输入，TextBox可以接受用户输入，TextBox的一个重要属性 是TextMode：
+SingleLine	单行
+MultiLine	多行
+Password	输入变成圆点
+Color		显示指定的颜色，单击会调出调色板对话框
+Date		显示日期，单击会调出日历对话框
+
+属性之AutoPostBack
+当TextBox中文本的内容发生变化时候，会自动把包含此控件的整个 页面发送到服务器上面。
+
+15 CheckBox
+复选框用于进行选择，用例如下：
+ <asp:CheckBox ID="chbNewLetter" runat="server" Text="Receive New?" />
+
+C#中获取checkBox的状态
+lblShow.Text = chbNewLetter.Checked.ToString();
+
+16 RadioButton
+RadioButton通常几个组合在一起，组合在一起的方法是通过RadioButton的Group属性，只要其属性一样就能做到RadioButton的分组。
+    <asp:RadioButton ID="RadioButton1" runat="server" GroupName="FineDay" 
+        Text="Sun" />
+    <p>
+        <asp:RadioButton ID="RadioButton2" runat="server" GroupName="FineDay" 
+            Text="Moon" />
+    </p>
+    <asp:RadioButton ID="RadioButton3" runat="server" GroupName="FineDay" 
+        Text="Star" />
+    <p>
+        <asp:Label ID="lblDay" runat="server" Text="Label"></asp:Label>
+    </p>
+    <asp:Button ID="btnSubmit" runat="server" onclick="btnSubmit_Click" 
+        Text="Submit" />
+
+17 Button 
+Button用来想服务器提交表单的按钮
+
+18 LinkButton
+LinkButton 同样是把表单发回服务器端，但是LinkButton并不是生成一个按钮，它是生成了一个链接
+<div>
+    
+        <asp:Label ID="Label1" runat="server" AssociatedControlID="TextBox1" 
+            Text="First Name"></asp:Label>
+        <br />
+        <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
+        <br />
+        <asp:Label ID="Label2" runat="server" AssociatedControlID="TextBox2" 
+            Text="Last Name"></asp:Label>
+        <br />
+        <asp:TextBox ID="TextBox2" runat="server"></asp:TextBox>
+    
+    </div>
+    <asp:LinkButton ID="LinkButton1" runat="server" onclick="LinkButton1_Click">LinkButton</asp:LinkButton>
+    <p>
+        <asp:Label ID="Label3" runat="server"></asp:Label>
+    </p>
+
+19 ImageButton
+ImageButton包含两个重要属性：
+ImageUrl：	图片地址
+AlternateText： 图片不能显示的时候，显示备用文本
+
+ImageButton的事件处理程序：
+ImageButton单击的时候，会获取点击的x.y坐标
+
+20 Button控件使用客户端脚本
+Button，LinkButton，ImageButton都支持OnClientClick属性，可以使用此属性来执行客户端代码
+
+
+21  Command时间
+Command事件不同于Click事件的是 Command时间可以传递一个Command名字以及Command参数
+
+实例：
+    <form id="form1" runat="server">
+    <div>
+    
+        <asp:Button ID="Button1" runat="server" CommandArgument="ASC" 
+            CommandName="Sort" oncommand="Sort_Command" Text="SortAsc" />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <asp:Button ID="Button2" runat="server" CommandArgument="DESC" 
+            CommandName="Sort" oncommand="Sort_Command" Text="SortDesc" />
+    
+    </div>
+    <asp:BulletedList ID="BulletedList1" runat="server" 
+        onprerender="BulletedList1_PreRender">
+    </asp:BulletedList>
+    </form>
+
+
+code_behind
+ private List<string> strList = new List<string>();
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            strList.Add("Apple");
+            strList.Add("Banana");
+            strList.Add("Colorpsue");
+        }
+
+        protected void Sort_Command(object sender, CommandEventArgs e)
+        {
+            if (e.CommandName == "Sort")
+            {
+                if (e.CommandArgument.ToString() == "ASC")
+                {
+                    strList.Sort(Sort_ASC);
+                }
+                if (e.CommandArgument.ToString() == "DESC")
+                {
+                    strList.Sort(Sort_DESC);
+                }
+            }
+        }
+
+        int Sort_ASC(string str1, string str2)
+        {
+            return String.Compare(str1,str2);
+        }
+
+        int Sort_DESC(string str1, string str2)
+        {
+            return String.Compare(str1,str2)*-1;
+        }
+
+        protected void BulletedList1_PreRender(object sender, EventArgs e)
+        {
+            BulletedList1.DataSource = strList;
+            BulletedList1.DataBind();
+        }
