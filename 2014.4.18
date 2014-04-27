@@ -1,0 +1,280 @@
+HTML 初步学习总结
+
+1 HTML标签
+
+•HTML 文档和 HTML 元素是通过 HTML 标签进行标记的
+•HTML 标签由开始标签和结束标签组成
+•开始标签是被括号包围的元素名
+•结束标签是被括号包围的斜杠和元素名
+•某些 HTML 元素没有结束标签，比如 <br />
+
+2  HTML标题
+<h1></h1>
+通过h1到h6指定字体不同的标题
+
+3 段落
+<p> </p>
+段落会忽略所有的空格以及换行
+
+4 链接
+<a href="http://www.w3school.com.cn">This is a link</a>
+
+5 HTML 图像
+<img src="w3school.jpg" width="104" height="142" />
+
+1 元素
+•HTML 元素以开始标签起始
+•HTML 元素以结束标签终止
+•元素的内容是开始标签与结束标签之间的内容
+•某些 HTML 元素具有空内容（empty content）
+•空元素在开始标签中进行关闭（以开始标签的结束而结束）
+•大多数 HTML 元素可拥有属性
+
+元素可以嵌套
+<html>
+
+<body>
+<p>This is my first paragraph.</p>
+</body>
+
+</html>
+其中<html>元素定义了整个html文档，<body>定义了文档主体。<p>元素定义段落
+
+2 属性
+HTML 标签可以拥有属性。属性提供了有关 HTML 元素的更多的信息。
+属性总是以名称/值对的形式出现，比如：name="value"。
+属性总是在 HTML 元素的开始标签中规定
+实力：
+<h1 align="center"> 		//拥有关于对齐方式的附加信息
+<body bgcolor="yellow"> 	//拥有关于背景颜色的附加信息
+
+3 标题 <head>
+是通过 <h1> - <h6> 等标签进行定义的。
+<h1> 定义最大的标题。<h6> 定义最小的标题。
+
+<hr /> 标签在 HTML 页面中创建水平线
+
+<!-- This is a comment --> HTML中注释
+
+4 段落 <p>
+段落是通过 <p> 标签定义的。
+<br/>拆行
+<p>This is<br />a para<br />graph with line breaks</p>
+
+5 文本格式化
+<b> 定义粗体文本。 
+<big> 定义大号字。 
+<em> 定义着重文字。 
+<i> 定义斜体字。 
+<small> 定义小号字。 
+<strong> 定义加重语气。 
+<sub> 定义下标字。 
+<sup> 定义上标字。 
+<ins> 定义插入字。 
+<del> 定义删除字。 
+<code> 定义计算机代码。 
+<kbd> 定义键盘码。 
+<samp> 定义计算机代码样本。 
+<tt> 定义打字机代码。 
+<var> 定义变量。 
+<pre> 定义预格式文本。 
+<abbr> 定义缩写。 
+<acronym> 定义首字母缩写。 
+<address> 定义地址。 
+<bdo> 定义文字方向。 
+<blockquote> 定义长的引用。 
+<q> 定义短的引用语。 
+<cite> 定义引用、引证。 
+<dfn> 定义一个定义项目。 
+
+6 html的编辑
+用文本编辑器编写html文档，最后保存为htm或者html格式，这两者没有什么区别。
+
+
+7 样式
+当浏览器读到一个样式表，它就会按照这个样式表来对文档进行格式化。有以下三种方式来插入样式表
+<1> 外部样式表
+当样式需要被应用到很多页面的时候，外部样式表将是理想的选择。使用外部样式表，你就可以通过更改一个文件来改变整个站点的外观
+<head>
+<link rel="stylesheet" type="text/css" href="mystyle.css">
+</head>
+
+<2> 内部样式表
+当单个文件需要特别样式时，就可以使用内部样式表。你可以在 head 部分通过 <style> 标签定义内部样式表。
+<head>
+<style type="text/css">
+body {background-color: red}
+p {margin-left: 20px}
+</style>
+</head>
+
+<3> 
+当特殊的样式需要应用到个别元素时，就可以使用内联样式。 使用内联样式的方法是在相关的标签中使用样式属性。样式属性可以包含任
+
+何 CSS 属性。以下实例显示出如何改变段落的颜色和左外边距。
+<p style="color: red; margin-left: 20px">
+This is a paragraph
+</p>
+
+8 图像
+<img> 是空标签，意思是说，它只包含属性，并且没有闭合标签
+<img src="boat.gif" alt="Big Boat">	在浏览器无法载入图像时，替换文本属性告诉读者她们失去的信息
+<body background="/i/eg_background.jpg">	背景图片
+<img src="/i/eg_cute.gif" align="bottom"> 	排列图片位置
+<img src="/i/eg_mouse.jpg" width="100" height="100">	设置图片尺寸
+
+<a href="/example/html/lastpage.html">			指定图片链接
+<img border="0" src="/i/eg_buttonnext.gif" />
+</a>
+
+带有可点击区域的图像映射：
+<img src="planets.jpg" border="0" usemap="#planetmap" alt="Planets" />
+
+<map name="planetmap" id="planetmap">
+  <area shape="circle" coords="180,139,14" href ="venus.html" alt="Venus" />
+  <area shape="circle" coords="129,161,10" href ="mercur.html" alt="Mercury" />
+  <area shape="rect" coords="0,0,110,260" href ="sun.html" alt="Sun" />
+</map>
+
+9 表格
+<table border="1">
+<tr>
+  <th>姓名</th>
+  <th>电话</th>
+  <th>电话</th>
+</tr>
+<tr>
+  <td>Bill Gates</td>
+  <td>555 77 854</td>
+  <td>555 77 855</td>
+</tr>
+</table>
+
+跨行的表
+<tr>
+  <th>姓名</th>
+  <th colspan="2">电话</th>
+</tr>
+
+跨行的列
+<tr>
+  <th rowspan="2">电话</th>
+  <td>555 77 854</td>
+</tr>
+
+10 列表
+<1>
+无序列表
+<ul>
+  <li>咖啡</li>
+  <li>茶</li>
+  <li>牛奶</li>
+</ul>
+显示如下：
+•Coffee
+•Milk
+
+<2>有序列表
+<ol>
+<li>Coffee</li>
+<li>Milk</li>
+</ol>
+
+1.Coffee
+2.Milk
+
+<3>自定义列表
+<dl>
+<dt>Coffee</dt>
+<dd>Black hot drink</dd>
+<dt>Milk</dt>
+<dd>White cold drink</dd>
+</dl>
+
+Coffee
+Black hot drink
+Milk
+White cold drink
+
+11 块元素
+<div> 是一个块级元素。这意味着它的内容自动地开始一个新行。实际上，换行是 <div> 固有的唯一格式表现。
+12布局
+布局可以通过div或者table来布局。
+div 元素是用于分组 HTML 元素的块级元素。下面的例子使用五个 div 元素来创建多列布局：
+
+<html>
+<head>
+<style type="text/css">
+div#container{width:600px}
+div#header {background-color:#99bbbb;}
+div#menu {background-color:#ffff99;height:200px;width:150px;float:left;}
+div#content {background-color:#EEEEEE;height:200px;width:350px;float:left;}
+div#footer {background-color:#99bbbb;clear:both;text-align:center;}
+h1 {margin-bottom:0;}
+h2 {margin-bottom:0;font-size:18px;}
+ul {margin:0;}
+li {list-style:none;}
+</style>
+</head>
+
+<body>
+
+<div id="container">
+
+<div id="header">
+<h1>Main Title of Web Page</h1>
+</div>
+
+<div id="menu">
+<h2>Menu</h2>
+<ul>
+<li>HTML</li>
+<li>CSS</li>
+<li>JavaScript</li>
+</ul>
+</div>
+
+<div id="content">Content goes here</div>
+
+<div id="footer">Copyright W3School.com.cn</div>
+
+</div>
+
+</body>
+</html>
+
+13 表单
+表单是一个包含表单元素的区域。表单元素是允许用户在表单中（比如：文本域、下拉列表、单选框、复选框等等）输入信息的元素。
+表单使用表单标签（<form>）定义
+<form>
+First name: 
+<input type="text" name="firstname" />
+<br />
+Last name: 
+<input type="text" name="lastname" />
+</form>
+
+表单的动作属性
+当用户单击确认按钮时，表单的内容会被传送到另一个文件。表单的动作属性定义了目的文件的文件名。由动作属性定义的这个文件通常会
+
+对接收到的输入数据进行相关的处理。
+<form name="input" action="html_form_action.asp" method="get">
+Username: 
+<input type="text" name="user" />
+<input type="submit" value="Submit" />
+</form>
+
+14 框架
+通过使用框架，你可以在同一个浏览器窗口中显示不止一个页面。每份HTML文档称为一个框架，并且每个框架都独立于其他的框架。
+
+使用框架的坏处：
+•开发人员必须同时跟踪更多的HTML文档
+•很难打印整张页面
+<frameset cols="25%,75%">
+   <frame src="frame_a.htm">
+   <frame src="frame_b.htm">
+</frameset>
+
+15 内联框架
+就是网页内显示嵌入网页
+<iframe src="URL"></iframe>
