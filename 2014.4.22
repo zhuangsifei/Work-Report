@@ -1,0 +1,177 @@
+javaScript  总结
+1 Javascript的基本功能
+<1>写入HTML输出
+document.write("<h1>This is a heading</h1>");
+<2>对事件作出反应
+<button type="button" onclick="alert('Welcome!')">点击这里</button>
+<3>改变HTML内容
+x=document.getElementById("demo")  //查找元素
+x.innerHTML="Hello JavaScript";    //改变内容
+<4>改变HTML图像
+
+element=document.getElementById('myimage')
+element.src="/i/eg_bulboff.gif";
+
+javaScript能够改变HTML的大多数属性，不仅仅是图片
+
+<5>验证输入
+if isNaN(x) {alert("Not Numeric")};
+<6>改变样式
+x=document.getElementById("demo")  //找到元素
+x.style.color="#ff0000";           //改变样式
+
+2 javaScript的使用
+<1>位置：
+HTML 中的脚本必须位于 <script> 与 </script> 标签之间。脚本可被放置在 HTML 页面的 <body> 和 <head> 部分中
+<2>惯例：
+通常会把JavaScript放在head中或者HTML的末尾，目的是处于清晰。
+<3>导入外来js文件
+也可以把脚本保存到外部文件中。外部文件通常包含被多个网页使用的代码。外部 JavaScript 文件的文件扩展名是 .js。
+<script src="myScript.js"></script>
+
+3 javaScript输出
+<1>通过改写HTML属性来输出
+document.getElementById("demo").innerHTML="My First JavaScript";
+<2>通过document.write输出
+document.write("<p>My First JavaScript</p>");
+如果在文档已完成加载后执行 document.write，整个 HTML 页面将被覆盖。
+
+4 javaScript语句
+<1>语句作用是告诉浏览器做什么
+<2>执行顺序是按书写顺序一步一步执行
+<3>分号标志语句结束，但是可有可无
+<4>代码块用花括号“{}”围起来，表示语句一起执行
+<5>对大小写敏感
+<6>通过‘\’来连接行
+document.write("Hello \
+World!");
+
+5 javaScript注释
+javaScript的注释风格同C/C++
+
+6 javaScript变量
+<1> 变量声明
+变量可以通过var来声明，或者直接通过给变量赋值免去var。
+var x = 12；
+y= 18；
+<2>多个变量声明
+var name="Gates", age=56, job="CEO";
+
+7 javaScript数据类型
+javaScript中的数据类型包括数字，布尔，字符串，数组，对象，NULL，Undefined
+<1> var x;		//Undefined
+    var y1 = 'sasa'	//string
+    var y2 = "sdsd"	//string
+    var z = false	//bool
+    
+<2>对象
+对象由花括号分隔。在括号内部，对象的属性以名称和值对的形式 (name : value) 来定义。属性由逗号分隔：
+var person={firstname:"Bill", lastname:"Gates", id:5566};
+
+对象的寻址：
+name=person.lastname;
+name=person["lastname"];
+
+<3>Undefined
+var xx;	// undefined 声明但是没有初始化的
+
+<4>NULL
+var car=null;	//用来清空变量值
+
+<5> new
+当您声明新变量时，可以使用关键词 "new" 来声明其类型：
+var carname=new String;
+var x=      new Number;
+
+<6> Array
+var cars = new Array("Audi","BMW","Volvo");  //Array
+var cars = ["dsd","dqwd","dwdewf"];	    //Array
+8 javaScript对象
+JavaScript 中的所有事物都是对象：字符串、数字、数组、日期，等等。在 JavaScript 中，对象是拥有属性和方法的数据。
+对象的一种新的定义方法
+person=new Object();
+person.firstname="Bill";
+person.lastname="Gates";
+person.age=56;
+person.eyecolor="blue";
+
+9 javaScript中的函数
+function functionname()
+{
+	//这里是要执行的代码
+}
+
+函数的使用方法类似java，C++的使用方法。
+虽然函数外面没有返回值类型，但是函数里面可以有return语句。
+
+10 javaScript中的运算符
+javaScript中有 + - * / % ++ -- += -= *= %= /=，操作方法同C/C++
+注意：数字和字符串相加，会把数字转化成字符串。
+
+11 javaScript中的条件语句
+if-else,switch语句
+这两种语句跟C++基本类似
+
+12 javaScript中的循环语句
+
+for - 循环代码块一定的次数
+for/in - 循环遍历对象的属性
+while - 当指定的条件为 true 时循环指定的代码块
+do/while - 同样当指定的条件为 true 时循环指定的代码块
+
+注意for-in循环，这个用于对象属性的遍历
+var person={fname:"John",lname:"Doe",age:25};
+
+for (x in person)
+  {
+  txt=txt + person[x];
+  }
+
+13 break语句的特性
+通过标签引用，break 语句可用于跳出任何 JavaScript 代码块：
+<script>
+cars=["BMW","Volvo","Saab","Ford"];
+list:
+{
+document.write(cars[0] + "<br>"); 
+document.write(cars[1] + "<br>"); 
+document.write(cars[2] + "<br>"); 
+break list;
+document.write(cars[3] + "<br>"); 
+}
+</script>
+
+执行结果：
+BMW
+Volvo
+Saab
+
+14 javaScript中的异常机制
+try 语句测试代码块的错误。
+catch 语句处理错误。
+throw 语句创建自定义错误。
+示例代码：
+<script>
+function myFunction()
+{
+try
+  {
+  var x=document.getElementById("demo").value;
+  if(x=="")    throw "empty";
+  if(isNaN(x)) throw "not a number";
+  if(x>10)     throw "too high";
+  if(x<5)      throw "too low";
+  }
+catch(err)
+  {
+  var y=document.getElementById("mess");
+  y.innerHTML="Error: " + err + ".";
+  }
+}
+</script>
+
+<h1>My First JavaScript</h1>
+<p>Please input a number between 5 and 10:</p>
+<input id="demo" type="text">
+<button type="button" onclick="myFunction()">Test Input</button>
+<p id="mess"></p>
