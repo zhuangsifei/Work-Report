@@ -1,0 +1,214 @@
+ASP.net rich控件
+
+1 上传文件控件 FileUpLoad
+上传文件这个控件并不是难，比较繁琐的而是绑定数据，在绑定数据时，我们用到了DataList控件，可以在DataList中添加ItemTemplate。
+<asp:DataList ID="dlstImages" runat="server" RepeatColumns="3" 
+            onprerender="Page_PreRender">
+            <ItemTemplate>
+                <asp:Image ID="Image1" runat="server" 
+                    ImageUrl='<%# Eval("Name", "~/UploadImage/{0}") %>' 
+                     Width="200px" />
+                     <br/>
+                     <%# Eval("Name")%>
+            </ItemTemplate>
+        </asp:DataList>
+
+注意这里的这个<%# Eval("Name", "~/UploadImage/{0}") %>，以及<%# Eval("Name")%>
+这样的格式是调用函数获取Eval函数，其中Eval("Name")返回的是FileInfo的Name属性。~/UploadImage/{0}是把Name加上去获得一个完整的图片路径。
+
+2 数据的绑定
+绑定数据在要在页面加载的时候完成，这里用到了事件PreRender
+  protected void Page_PreRender(object sender, EventArgs e)
+        {
+            string upFolder = MapPath("~/UploadImages/");
+            DirectoryInfo dir = new DirectoryInfo(upFolder);
+            dir.Create();
+
+            dlstImages.DataSource = dir.GetFiles();
+            dlstImages.DataBind();
+        }
+
+通过这个函数完成了文件目录的创建，以及数据的绑定。
+
+3  文件的保存
+protected void btnAdd_Click(object sender, EventArgs e)
+        {
+            if (upImage.HasFile)
+            {
+                if (CheckImageType(upImage.FileName))
+                {
+                    String filePath = "~/UploadImages/" + upImage.FileName;
+                    upImage.SaveAs(MapPath(filePath));
+                }
+            }
+	}
+设置新的文件路径，实现文件的保存
+
+4 关于Calendar
+日历上面具有很多属性可以设置，其中有个SelectionMode属性，通过设置这个属性，可以同时选取一个月，一周，一天。
+显示一个日历很简单，只需要添加一个标签即可
+<asp:Calendar id="calEventDate" Runat="server" />
+
+弹出式日历的创建，这里用到了CSS，Javascript，html，C#服务器端代码
+<script runat="server">
+
+    protected void calEventDate_SelectionChanged(object sender, EventArgs e)
+    {
+        txtEventDate.Text = calEventDate.SelectedDate.ToString("d");
+    }
+
+    protected void btnSubmit_Click(object sender, EventArgs e)
+    {
+        lblResult.Text = "You picked: " + txtEventDate.Text;
+    }
+</script>
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head id="Head1" runat="server">
+    <script type="text/javascript">
+
+        function displayCalendar() {
+            var datePicker = document.getElementById('datePicker');
+            datePicker.style.display = 'block';
+        }
+    
+    </script>
+    <style type="text/css">
+        #datePicker
+        {
+            display:none;
+            position:absolute;
+            border:solid 2px black;
+            background-color:white;
+        }
+        .content
+        {
+            width:400px;
+            background-color:white;
+            margin:auto;
+            padding:10px;
+        }
+        html
+        {
+            background-color:silver;
+        }
+    </style>
+    <title>Calendar with JavaScript</title>
+</head>
+<body>
+    <form id="form1" runat="server">
+    <div class="content">
+    
+    <asp:Label
+        id="lblEventDate"
+        Text="Event Date:"
+        AssociatedControlID="txtEventDate"
+        Runat="server" />
+    <asp:TextBox
+        id="txtEventDate"
+        Runat="server" />
+    <img src="Calendar.jpg" onclick="displayCalendar()" width="30" />
+    
+    <div id="datePicker">
+    <asp:Calendar
+        id="calEventDate"
+        OnSelectionChanged="calEventDate_SelectionChanged" 
+        Runat="server" />
+    </div>
+
+    <br />
+    <asp:Button
+        id="btnSubmit"
+        Text="Submit"
+        Runat="server" OnClick="btnSubmit_Click" />
+
+    <hr />
+
+    <asp:Label
+        id="lblResult"
+        Runat="server" />
+        
+    </div>
+    </form>
+</body>
+</html>
+
+这段代码需要解释一下：<1>是多了个<style type="text/css">,它在这里定义了ID是dataPicker的div块的显示为display:none;
+<2><img src="Calendar.jpg" onclick="displayCalendar()" width="30" /> 中通过Javascript脚本指定了点击图片时显示日历。
+
+5 不同页面的显示和隐藏
+MultiView可以实现不同页面的显示和隐藏。
+<asp:MultiView
+        id="MultiView1"
+        ActiveViewIndex="0"
+        Runat="server">
+        <asp:View ID="View1" runat="server">
+            <br />This is the first view
+            <br />This is the first view
+            <br />This is the first view
+            <br />This is the first view
+        </asp:View>        
+        <asp:View ID="View2" runat="server">
+            <br />This is the second view
+            <br />This is the second view
+            <br />This is the second view
+            <br />This is the second view
+        </asp:View>        
+        <asp:View ID="View3" runat="server">
+            <br />This is the third view
+            <br />This is the third view
+            <br />This is the third view
+            <br />This is the third view
+        </asp:View>        
+    </asp:MultiView>
+
+针对这样的布局，可以通过一个菜单来选择MultiVIew中不同的选项实现不同View的切换
+
+6 MultiView控件识别的命令
+NextView，PrevView，SwitchViewByID,SwitchViewByIndex 通过设置按钮的CommandName属性可以设置使用这些命令，如果是SwitchViewByID,SwitchViewByIndex则通过CommandArgument。示例如下：
+<asp:MultiView
+        id="MultiView1"
+        ActiveViewIndex="0"
+        Runat="server">
+        <asp:View ID="View1" runat="server">
+        <h1>Step 1</h1>
+        <asp:Label
+            id="lblFirstName"
+            Text="Enter Your First Name:"
+            AssociatedControlID="txtFirstName"
+            Runat="server" />
+        <br />
+        <asp:TextBox
+            id="txtFirstName"
+            Runat="server" />
+            
+        <br /><br />
+        
+        <asp:Button
+            id="btnNext"
+            Text="Next"
+            CommandName="NextView"
+            Runat="server" />    
+        
+        </asp:View>    
+</asp:MultiView>
+
+7 Wizard控件
+Wizard控件包含一个或者多个WizardStep子部件，整个空间分为左右两部分，坐标设置子部件的标题，右边设置子部件的内容。内容下面显示Button按钮，可以向前或者向后。
+Wizard控件整体功能类似MultiView，但是比MultiView更加强大和灵活。示例如下：
+<asp:Wizard ID="Wizard1" runat="server" ActiveStepIndex="3" Height="215px" 
+            Width="275px">
+            <WizardSteps>
+                <asp:WizardStep runat="server" Title="Study">
+                    <asp:TextBox ID="TextBox1" runat="server" Height="58px" Width="116px">Only study can change the 			world</asp:TextBox>
+                </asp:WizardStep>
+                <asp:WizardStep runat="server" Title="Learn">
+                    <asp:Label ID="Label1" runat="server" Text="You are right"></asp:Label>
+                </asp:WizardStep>
+                <asp:WizardStep runat="server" Title="Show">
+                    <asp:Image ID="Image1" runat="server" />
+                </asp:WizardStep>
+                <asp:WizardStep runat="server" Title="Great">
+                    <asp:TextBox ID="TextBox2" runat="server">we are the world,and we are the children</asp:TextBox>
+                </asp:WizardStep>
+            </WizardSteps>
+        </asp:Wizard>
