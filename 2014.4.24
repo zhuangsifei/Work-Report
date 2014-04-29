@@ -1,0 +1,144 @@
+javaScript 关于Windows
+
+1 Windows 对象
+<1>所有浏览器都支持 window 对象。它表示浏览器窗口。
+<2>所有 JavaScript 全局对象、函数以及变量均自动成为 window 对象的成员。
+<3>全局变量是 window 对象的属性。
+<4>全局函数是 window 对象的方法。
+
+window.document.getElementById("header");
+
+2 Windows常用函数
+<1>获取Windows尺寸
+var w=window.innerWidth
+|| document.documentElement.clientWidth
+|| document.body.clientWidth;
+
+var h=window.innerHeight
+|| document.documentElement.clientHeight
+|| document.body.clientHeight;
+<2>其它常见函数
+window.open() - 打开新窗口
+window.close() - 关闭当前窗口
+window.moveTo() - 移动当前窗口
+window.resizeTo() - 调整当前窗口的尺寸
+
+3 Screen对象
+screen.availWidth - 可用的屏幕宽度
+screen.availHeight - 可用的屏幕高度
+
+
+4 Location对象
+document.write(location.pathname +'<br/>'); 	返回 web 主机的域名
+document.write(location.hostname  +'<br/>');	返回当前页面的路径和文件名
+document.write(location.protocol  +'<br/>'); 	返回所使用的 web 协议（http:// 或 https://
+document.write(location.href);			返回正URL
+location.assign("http://www.w3school.com.cn")	加载新的网页
+
+
+5 History对象
+window.history 对象包含浏览器的历史
+history.back() - 与在浏览器点击后退按钮相同
+history.forward() - 与在浏览器中点击按钮向前相同
+示例如下：
+
+function goForward()
+  {
+  window.history.forward()
+  }
+</script>
+</head>
+<body>
+
+<input type="button" value="Forward" onclick="goForward()">
+
+6 Navigator对象
+window.navigator 对象包含有关访问者浏览器的信息
+
+navigator.appCodeName 		Mozilla
+navigator.appName 		Netscape
+navigator.appVersion 		5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.76 						Safari/537.36
+navigator.cookieEnabled 	true
+navigator.platform 		Win32
+navigator.userAgent 		Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) 				Chrome/29.0.1547.76 Safari/537.36
+navigator.systemLanguage 	undefined
+
+注意：来自 navigator 对象的信息具有误导性，不应该被用于检测浏览器版本，这是因为：
+navigator 数据可被浏览器使用者更改
+浏览器无法报告晚于浏览器发布的新操作系统
+
+7 javaScript消息框
+<1> 警告框
+警告框经常用于确保用户可以得到某些信息。当警告框出现后，用户需要点击确定按钮才能继续进行操作
+alert("文本")
+<2> 确认框 
+确认框用于使用户可以验证或者接受某些信息。当确认框出现后，用户需要点击确定或者取消按钮才能继续进行操作。如果用户点击确认，那么返回值为 true。如果用户点击取消，那么返回值为 false
+confirm("文本")
+<3> 提示框
+提示框经常用于提示用户在进入页面前输入某个值。当提示框出现后，用户需要输入某个值，然后点击确认或取消按钮才能继续操纵。如果用户点击确认，那么返回值为输入的值。如果用户点击取消，那么返回值为 null。
+var name=prompt("请输入您的名字",输入的默认值)
+
+8 javaScript 计时器
+有关计时的两个关键函数
+setTimeOut()	//设置一个计时器
+clearTimeout()	//取消一个计时器
+setTimeout() 的第一个参数是含有 JavaScript 语句的字符串。这个语句可能诸如 "alert('5 seconds!')"，或者对函数的调用，诸如 alertMsg()"。第二个参数指示从当前起多少毫秒后执行第一个参数。
+示例如下：
+ t=setTimeout("timedCount()",1000)
+ clearTimeout(t)
+
+9 javaScript Cookie
+cookie 是存储于访问者的计算机中的变量。每当同一台计算机通过浏览器请求某个页面时，就会发送这个 cookie。你可以使用 JavaScript 来创建和取回 cookie 的值
+用cookie主要的过程：
+设置cookie
+获取cookie
+检测cookie
+<1> 设置cookie
+function setCookie(c_name,value,expiredays)
+{
+	var exdate=new Date()
+	exdate.setDate(exdate.getDate()+expiredays)
+	document.cookie=c_name+ "=" +escape(value)+((expiredays==null) ? "" : ";expires="+exdate.toGMTString())
+}
+<2> 获取cookie
+function getCookie(c_name)
+{
+if (document.cookie.length>0)
+  {
+  c_start=document.cookie.indexOf(c_name + "=")
+  if (c_start!=-1)
+    { 
+    c_start=c_start + c_name.length+1 
+    c_end=document.cookie.indexOf(";",c_start)
+    if (c_end==-1) c_end=document.cookie.length
+    return unescape(document.cookie.substring(c_start,c_end))
+    } 
+  }
+return ""
+}
+
+<3> 检查cookie
+function checkCookie()
+{
+username=getCookie('username')
+if (username!=null && username!="")
+  {alert('Welcome again '+username+'!')}
+else 
+  {
+  username=prompt('Please enter your name:',"")
+  if (username!=null && username!="")
+    {
+    setCookie('username',username,365)
+    }
+  }
+}
+
+注意：
+1>:字符串存进Cookie的时候，内容是累加，各段内容之间是通过分号";"隔开
+2>:在使用键值对的形式存储cookie的时候，索引的关键字可是为中文，同一个关键字所具有的值会相互覆盖。
+document.cookie ="动物=乌龟";
+document.cookie ="动物=王八";
+最后cookie中存的是document.cookie ="动物=王八";因为王八跟乌龟关键字相同，因此王八覆盖乌龟
+3>:cookie 赋值
+document.cookie = "xxx"; //or
+document.cookie = "yyy=xxx"
