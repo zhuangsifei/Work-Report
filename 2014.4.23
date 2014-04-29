@@ -1,0 +1,235 @@
+javaScript DOM学习总结
+通过 HTML DOM，可访问 JavaScript HTML 文档的所有元素
+
+1 修改HTML元素内容
+document.write(Date()); //在输入流中直接写
+document.getElementById(id).innerHTML=new HTML	//改变已经有的元素内容
+document.getElementById("image").src="landscape.jpg";	//改变属性值
+
+2 修改CSS的值
+document.getElementById(id).style.property=new style
+利用这个可以改变文字的大小，颜色，字体等，示例如下：
+document.getElementById("p2").style.color="blue";	//改变颜色
+onclick="document.getElementById('p1').style.visibility='visible'" /> //改变可见性
+
+3 对事件作出反应
+HTML DOM 使 JavaScript 有能力对 HTML 事件做出反应。
+<1> 使用DOM语句
+<h1 onclick="this.innerHTML='谢谢!'">请点击该文本</h1>
+<2> 在元素标签中分配事件，使用函数
+<head>
+<script>
+function changetext(id)
+{
+id.innerHTML="谢谢!";
+}
+</script>
+</head>
+<body>
+<h1 onclick="changetext(this)">请点击该文本</h1>
+</body>
+
+<3> 在javaScript脚本中添加匿名事件
+这个格式跟前面的不一样，以function开头
+<script>
+document.getElementById("myBtn").onclick=function(){displayDate()};
+</script>
+
+<4> javaScript中添加事件
+这个需要注意的是，函数后面不能添加括号（）。
+document.getElementById("myBtn").onclick=displayDate;
+
+<5> 常见的事件
+onload 		//进入页面
+onunload 	//离开页面
+onchange 	//用户改变输入字段的内容时
+onmouseover 	//鼠标移动进去
+onmouseout 	//鼠标离开
+onmousedown	//鼠标按键按下
+onmouseup 	//鼠标按键弹起
+onclick 	//单击
+
+4 javaScript创建或者删除节点
+<1> 创建新节点
+如需向 HTML DOM 添加新元素，您必须首先创建该元素（元素节点），然后向一个已存在的元素追加该元素
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="div1">
+<p id="p1">这是一个段落。</p>
+<p id="p2">这是另一个段落。</p>
+</div>
+
+<script>
+var para=document.createElement("p");
+var node=document.createTextNode("这是新段落。");
+para.appendChild(node);
+
+var element=document.getElementById("div1");
+element.appendChild(para);
+</script>
+
+</body>
+</html>
+
+<2> 删除节点
+如需删除 HTML 元素，您必须首先获得该元素的父元素：
+<!DOCTYPE html>
+<html>
+<body>
+
+<div id="div1">
+<p id="p1">这是一个段落。</p>
+<p id="p2">这是另一个段落。</p>
+</div>
+
+<script>
+var parent=document.getElementById("div1");
+var child=document.getElementById("p1");
+parent.removeChild(child);
+</script>
+
+</body>
+</html>
+
+5 JavaScript中对象
+javaScript中所有的事物都是对象，对象时指带有属性和方法的
+<1> 对象的创建
+定义并创建对象的实例，然后给对象添加属性
+person=new Object();
+person.firstname="Bill";
+person.lastname="Gates";
+
+<2> 隐式创建
+person={firstname:"John",lastname:"Doe",age:50,eyecolor:"blue"};
+
+<3> 使用函数来定义对象，并创建对象的实例
+function person(firstname,lastname,age,eyecolor)
+{
+this.firstname=firstname;
+this.lastname=lastname;
+this.age=age;
+this.eyecolor=eyecolor;
+}
+var myFather=new person("Bill","Gates",56,"blue");
+
+
+6 javaScript中的Number对象
+<1>   数字的定义
+JavaScript 只有一种数字类型，JavaScript 不是类型语言，JavaScript 中的所有数字都存储为根为 10 的 64 位（8 比特），浮点数。
+var pi=3.14;    // 使用小数点
+var x=34;       // 不使用小数点
+var y=123e5;    // 12300000
+var z=123e-5;   // 0.00123
+
+<2> 精度
+整数（不使用小数点或指数计数法）最多为 15 位。
+小数的最大位数是 17，但是浮点运算并不总是 100% 准确：
+
+<3>进制
+如果前缀为 0，则 JavaScript 会把数值常量解释为八进制数，如果前缀为 0 和 "x"，则解释为十六进制数。
+
+<4>常见属性和方法
+constructor	返回对创建此对象的 Number 函数的引用。
+MAX_VALUE	可表示的最大的数。
+MIN_VALUE	可表示的最小的数。
+NaN		非数字值。
+NEGATIVE_INFINITY	负无穷大，溢出时返回该值。
+POSITIVE_INFINITY	正无穷大，溢出时返回该值。
+prototype		使您有能力向对象添加属性和方法
+
+toString	把数字转换为字符串，使用指定的基数。
+toLocaleString	把数字转换为字符串，使用本地数字格式顺序。
+toFixed		把数字转换为字符串，结果的小数点后有指定位数的数字。
+toExponential	把对象的值转换为指数计数法。
+toPrecision	把数字格式化为指定的长度。
+valueOf		返回一个 Number 对象的基本数字值。
+
+7 javaScript中的String对象
+字符串函数和C/C++，java的很类似，凡是字符串都是涉及到字符串的查找，字符的查找，大小写转换，字符串的替换。
+属性：
+constructor	对创建该对象的函数的引用
+length	字符串的长度
+prototype	允许您向对象添加属性和方法
+
+常用方法：
+anchor(),创建HTML的锚（链接），函数的参数表示锚的名称
+charAt()	返回在指定位置的字符。
+concat()	连接字符串。
+toLocaleLowerCase()	把字符串转换为小写。
+toLocaleUpperCase()	把字符串转换为大写。
+toLowerCase()	把字符串转换为小写。
+toUpperCase()	把字符串转换为大写。
+
+8  javaScript的 Date对象
+常见方法
+Date()	返回当日的日期和时间。
+getDate()	从 Date 对象返回一个月中的某一天 (1 ~ 31)。
+getDay()	从 Date 对象返回一周中的某一天 (0 ~ 6)。
+getMonth()	从 Date 对象返回月份 (0 ~ 11)。
+getFullYear()	从 Date 对象以四位数字返回年份。
+getYear()	请使用 getFullYear() 方法代替。
+getHours()	返回 Date 对象的小时 (0 ~ 23)。
+getMinutes()	返回 Date 对象的分钟 (0 ~ 59)。
+getSeconds()	返回 Date 对象的秒数 (0 ~ 59)。
+getMilliseconds()	返回 Date 对象的毫秒(0 ~ 999)。
+getTime()	返回 1970 年 1 月 1 日至今的毫秒数。
+setFullYear()	设置 Date 对象中的年月日
+
+9 javaScript的Array对象
+<1> 定义数组
+
+var mycars=new Array()
+mycars[0]="Saab"
+mycars[1]="Volvo"
+mycars[2]="BMW"
+或者
+var mycars=new Array(3)
+mycars[0]="Saab"
+mycars[1]="Volvo"
+或者
+var mycars=new Array("Saab","Volvo","BMW")
+或者 
+var mycars=new ["Saab","Volvo","BMW"]
+mycars[2]="BMW"
+
+<2> 常见的函数
+concat()	连接两个或更多的数组，并返回结果。
+join()		把数组的所有元素放入一个字符串。元素通过指定的分隔符进行分隔。
+pop()		删除并返回数组的最后一个元素
+push()		向数组的末尾添加一个或更多元素，并返回新的长度。
+reverse()	颠倒数组中元素的顺序。
+sort()		对数组的元素进行排序
+
+10 javaScript Boolean对象的创建
+new Boolean(value);	//构造函数
+Boolean(value);		//转换函数
+
+如果逻辑对象无初始值或者其值为 0、-0、null、""、false、undefined 或者 NaN，那么对象的值为 false。否则，其值为 true（即使当
+
+自变量为字符串 "false" 时）！
+
+11 javaScript Math 对象
+Math（算数）对象的作用是：执行常见的算数任务
+属性
+E	返回算术常量 e，即自然对数的底数（约等于2.718）。
+LN2	返回 2 的自然对数（约等于0.693）。
+LN10	返回 10 的自然对数（约等于2.302）。
+LOG2E	返回以 2 为底的 e 的对数（约等于 1.414）。
+LOG10E	返回以 10 为底的 e 的对数（约等于0.434）。
+PI	返回圆周率（约等于3.14159）。
+SQRT1_2	返回返回 2 的平方根的倒数（约等于 0.707）。
+SQRT2	返回 2 的平方根（约等于 1.414）。
+
+常见的函数
+ceil(x)	对数进行上舍入。
+floor(x)	对数进行下舍入。
+max(x,y)	返回 x 和 y 中的最高值。
+min(x,y)	返回 x 和 y 中的最低值。
+pow(x,y)	返回 x 的 y 次幂。
+random()	返回 0 ~ 1 之间的随机数。
+round(x)	把数四舍五入为最接近的整数。
+sqrt(x)	返回数的平方根。
+tan(x)	返回角的正切。
+以及一些正余弦，正余切三角函数，反三角函数，指数函数等
