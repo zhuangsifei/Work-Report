@@ -1,0 +1,176 @@
+css 学习总结：
+1	css作用
+CSS 指层叠样式表 (Cascading Style Sheets)
+样式定义如何显示 HTML 元素
+样式通常存储在样式表中
+把样式添加到 HTML 4.0 中，是为了解决内容与表现分离的问题
+外部样式表可以极大提高工作效率
+外部样式表通常存储在 CSS 文件中
+多个样式定义可层叠为一
+2	css定义的位置
+
+样式表允许以多种方式规定样式信息。样式可以规定在单个的 HTML 元素中，在 HTML 页的头元素中，或在一个外部的 CSS 文件中。甚至可以在同一个 HTML 文档内部引用多个外部样式表。
+
+3	样式表层叠的优先级
+
+一般而言，所有的样式会根据下面的规则层叠于一个新的虚拟样式表中，其中数字 4 拥有最高的优先权。
+1>浏览器缺省设置
+2>外部样式表
+3>内部样式表（位于 <head> 标签内部）
+4>内联样式（在 HTML 元素内部）
+因此，内联样式（在 HTML 元素内部）拥有最高的优先权，这意味着它将优先于以下的样式声明：<head> 标签中的样式声明，外部样式表中的样式声明，或者浏览器中的样式声明（缺省值）。
+
+4 	css语法规则
+CSS 规则由两个主要的部分构成：选择器，以及一条或多条声明。
+selector {declaration1; declaration2; ... declarationN }
+其中selector要改变样式的HTML元素，声明由属性和值配对组成，声明之间用";"
+p {
+  text-align: center;
+  color: black;
+  font-family: arial;
+}
+
+5 	css选择器的分组
+你可以对选择器进行分组，这样，被分组的选择器就可以分享相同的声明。用逗号将需要分组的选择器分开。在下面的例子中，我们对所有的标题元素进行了分组。所有的标题元素都是绿色的。
+h1,h2,h3,h4,h5,h6 {
+  color: green;
+  }
+
+6	css继承的问题
+根据 CSS，子元素从父元素继承属性。但是它并不总是按此方式工作。
+body {
+     font-family: Verdana, sans-serif;
+     }
+中由于浏览器之间的竞争，他们不能完全的支持CSS的标准，可能会导致子元素不会对父元素进行继承，这个时候可以通过冗余来解决问题。
+body  {
+     font-family: Verdana, sans-serif;
+     }
+
+td, ul, ol, ul, li, dl, dt, dd  {
+     font-family: Verdana, sans-serif;
+     }
+
+p  {
+     font-family: Times, "Times New Roman", serif;
+     }
+这样的话，即便子元素不会继承父元素，但是我们指出了那些可能不集成的资源素并且重新为他们制定style。
+其次，我们改变了p的style。
+
+7	css派生选择器
+派生选择器允许你根据文档的上下文关系来确定某个标签的样式。
+比方说，你希望列表中的 strong 元素变为斜体字，而不是通常的粗体字，可以这样定义一个派生选择器：
+li strong {
+    font-style: italic;
+    font-weight: normal;
+  }
+
+实例：
+<html>
+	<head>
+		<style type="text/css">
+			strong {
+				color: red;
+			}
+
+			h2 {
+				color: red;
+			}
+
+			h2 strong {
+				color: blue;
+			}
+		</style>
+	</head>
+		<p>The strongly emphasized word in this paragraph is<strong>red</strong>.</p>
+		<h2>This subhead is also red.</h2>
+		<h2>The strongly emphasized word in this subhead is<strong>blue</strong>.</h2>
+	<body>
+	</body>
+</html>
+
+8 	css后代选择器
+后代选择器（descendant selector）又称为包含选择器。后代选择器可以选择作为某元素后代的元素。
+h1 em {color:red;}
+h1 em 选择器可以解释为 “作为 h1 元素后代的任何 em 元素”。如果要从左向右读选择器，可以换成以下说法：“包含 em 的所有 h1 会把以下样式应用到该 em”。
+
+9	css子元素选择器
+如果您不希望选择任意的后代元素，而是希望缩小范围，只选择某个元素的子元素，请使用子元素选择器（Child selector）。
+
+h1 > strong {color:red;}
+<h1>This is <strong>very</strong> <strong>very</strong> important.</h1>
+<h1>This is <em>really <strong>very</strong></em> important.</h1>
+这个规则会把第一个 h1 下面的两个 strong 元素变为红色，但是第二个 h1 中的 strong 不受影响：
+
+10	css相邻兄弟选择器
+如果需要选择紧接在另一个元素后的元素，而且二者有相同的父元素，可以使用相邻兄弟选择器（Adjacent sibling selector）。
+h1 + p {margin-top:50px;}
+
+11	class ID 选择器
+id 选择器可以为标有特定 id 的 HTML 元素指定特定的样式。
+id 选择器以 "#" 来定义。
+标注为 sidebar 的元素只能在文档中出现一次，这个 id 选择器作为派生选择器也可以被使用很多次。
+#sidebar {
+	border: 1px dotted #000;
+	padding: 10px;
+	}
+
+#sidebar p {
+	font-style: italic;
+	text-align: right;
+	margin-top: 0.5em;
+	}
+
+12 	类选择器
+在 CSS 中，类选择器以一个点号显示：
+.center {text-align: center}
+在下面的 HTML 代码中，h1 和 p 元素都有 center 类。这意味着两者都将遵守 ".center" 选择器中的规则。
+<h1 class="center">
+This heading will be center-aligned
+</h1>
+
+<p class="center">
+This paragraph will also be center-aligned.
+</p>
+
+13	属性选择器
+可以为拥有指定属性的 HTML 元素设置样式，而不仅限于 class 和 id 属性。
+只有在规定了 !DOCTYPE 时，IE7 和 IE8 才支持属性选择器。在 IE6 及更低的版本中，不支持属性选择。示例：
+[title]
+{
+color:red;
+}
+<1> 属性值满足等于制定值的
+[title=W3School]
+{
+border:5px solid blue;
+}
+
+<2> 属性值满足包含某一值的
+[title~=hello] { color:red; } // title = "hello world"
+<3> 用于选取带有以指定值开头的属性值的元素，该值必须是整个单词
+[attribute|=value]
+
+14 	 创建CSS
+<1>  外部样式表
+每个页面使用 <link> 标签链接到样式表。<link> 标签在（文档的）头部：
+<head>
+<link rel="stylesheet" type="text/css" href="mystyle.css" />
+</head>
+其中样式表应该以 .css 扩展名进行保存，文件中不能包含任何html的标签。示例如下：
+hr {color: sienna;}
+p {margin-left: 20px;}
+body {background-image: url("images/back40.gif");}
+<2>  内部样式表
+当单个文档需要特殊的样式时，就应该使用内部样式表。你可以使用 <style> 标签在文档头部定义内部样式表
+<head>
+<style type="text/css">
+  hr {color: sienna;}
+  p {margin-left: 20px;}
+  body {background-image: url("images/back40.gif");}
+</style>
+</head>
+<3>  内联样式表
+内联样式是把元素的表现和形式结合在一起，这样就比较混乱。使用内联样式需要在元素标签内使用style属性。示例如下：
+<p style="color: sienna; margin-left: 20px">
+This is a paragraph
+</p>
