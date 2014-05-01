@@ -1,0 +1,79 @@
+创建网页
+
+1 母版页的创建
+所谓的母版页就是可以当做模子以被网页使用，网页在模板上填充具体的东西。ASP.NET中，母版页后缀时master。文件的开头是这样的一
+
+句话
+<%@ Master Language="C#" MasterPageFile="~/Site.master" %>
+2 ContentPlaceHolder
+网页中的每一个待填充的地方都要使用ContentPlaceHolder控件，网页在使用母版页的时候，就是在每一个ContenPlaceHolder中
+
+3 母版页上的默认内容
+我们可以在母版也上的ContentPlaceHolder中添加控件，如果饮用母版页的网页没有在ContentPlaceHolder中填充相关的组件，那么网页就
+
+会显示
+示例程序如下所示：
+<body>
+    <form id="form1" runat="server">
+    <div class="content">
+        <div class="leftColumn">
+        
+            <asp:contentplaceholder 
+                id="ContentPlaceHolder1" 
+                runat="server"/>
+        
+        </div>
+
+        <div class="rightColumn">
+        
+            <asp:Contentplaceholder 
+                id="ContentPlaceHolder2" 
+                runat="server">
+        
+                <asp:TextBox ID="TextBox1" runat="server" TextMode="MultiLine">what a fucking day it is!
+                </asp:TextBox>
+            </asp:ContentPlaceHolder>
+        
+        </div>
+        <br class="clear" />
+    </div>
+    </form>
+</body>
+
+
+4 float属性对布局的影响
+float主要的三个属性，none，left，right。
+当float为none的时候，块会换行，这个时候如果有两个div的话就会竖直排列，否则就会并排水平排列。
+
+
+5 母版页的嵌套
+母版页可以进行不限级的嵌套。说白了就是在空间ContentPlaceHolder中布置ContentPlaceHolder。
+
+6 母版页中相对URL的使用
+如果使用的是ASP.NET空间，那么URL就会被解析成相对母版页的ＵＲＬ，如果是ＨＴＭＬ空间，URL会被解析成相对内容页的URL。
+针对这个问题的解决方法
+<1> 全部使用ASP.NET控件
+<2>在使用HTML控件的时候，使用Page.ResolverUrl（URL）来转换成正确的路径。
+
+7 通过编程来修改母版页的标题以及CSS风格
+这个时候可以使用Page.Header属性
+<1>利用程序进行改变，但是这个时候需要在开头的
+<%@ Page Language="C#" MasterPageFile="~/SimpleMaster.master" CodeBehind="SimpleContent.aspx.cs"
+ Inherits="WebApplication5.SimpleContent"%>中一定要指定Inherits的值，因为在SimpleContent.aspx.design.cs中要依据这个来构造
+
+类。
+<2>
+在Page_Load函数中指定函数要修改的属性
+protected void Page_Load(object sender, EventArgs e)
+        {
+            Page.Header.Title = String.Format("headContent:{0}",DateTime.Now);
+
+            Style style = new Style();
+            style.BackColor = System.Drawing.Color.Black;
+            Page.Header.StyleSheet.CreateStyleRule(style,null,"html");
+        }
+
+8 仅仅修改标题
+仅仅修改内容页的标题，可以在利用<%Page %>指令的Title属性。
+<%@ Page Language="C#" MasterPageFile="~/SimpleMaster.master" CodeBehind="SimpleContent.aspx.cs"
+ Inherits="WebApplication5.SimpleContent" Title="what a fuck day" %>
