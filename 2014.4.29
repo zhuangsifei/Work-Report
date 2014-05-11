@@ -1,0 +1,4 @@
+在昨天的基础上面，将分词类移植到ASP.net的网页程序集中，但是经过测试，发现了在这里面不能实现正确的分词，得到的Term中只是简单的
+把句子断句，空格分开。经过仔细调试并且研究发现在Lucene.net3.03 中采取的与以往不同的技术，不需要多次创建TokenStream类的实例
+利用函数ReusableTokenStream可以减少资源的开销以及浪费。因此就必须重载ReusableTokenStream函数，此外还要继续添加一些函数去修改
+DChineseTokenizer类，最终经过测试成功。
