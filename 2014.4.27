@@ -1,0 +1,8 @@
+找到做站内搜索的方法，就是利用Lucene.Net进行站内搜索，并且对最新版的Lucene.Net的源码进行阅读学习。
+Lucene.Net的官网：http://lucenenet.apache.org/docs/3.0.3/Index.html
+一些Lucene.Net的入门Blog：
+http://www.cnblogs.com/birdshover/archive/2008/09/01/1280780.html
+http://www.cnblogs.com/forfuture1978/archive/2010/06/06/1752837.html
+http://book.51cto.com/art/200805/72693.htm
+http://www.cnblogs.com/chengtian/archive/2013/01/30/2883259.html
+http://blog.csdn.net/shanluan_/article/details/9150161
